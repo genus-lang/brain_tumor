@@ -1,0 +1,26 @@
+# Virtual Environment
+.venv/
+env/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Large Dataset (stored locally / Kaggle)
+dataset/
+*.zip
+*.tar
+*.tar.gz
+
+# Uploaded test files & artifacts
+uploads/*
+!uploads/.gitkeep
+
+# Large Model weights (>100MB exceeds GitHub limits)
+models/*.h5
+models/*.keras
+!models/.gitkeep
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
