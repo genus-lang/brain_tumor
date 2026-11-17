@@ -82,7 +82,7 @@ def handle_upload(custom_file_location=None, original_filename=None):
         pred_data = predict_mri(file_location)
 
         # 2. Generate Grad-CAM pure heatmap and overlay
-        gradcam_data = generate_gradcam(file_location)
+        gradcam_data = generate_gradcam(file_location, target_class_idx=pred_data.get('class_index'))
         gradcam_data['original_url'] = f"/uploads/{filename}"
 
         # 3. Cache latest analysis
@@ -151,14 +151,15 @@ def explainable_ai():
     active_file = last_analysis.get('file_path')
 
     if not active_gradcam:
-        sample_path = 'Te-gl_0015.jpg'
-        if os.path.exists(sample_path):
-            dest = os.path.join(app.config['UPLOAD_FOLDER'], 'sample_Te-gl_0015.jpg')
+        sample_path = SAMPLE_IMAGES.get('glioma')
+        if sample_path and os.path.exists(sample_path):
+            filename = 'sample_glioma_xai.jpg'
+            dest = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             shutil.copyfile(sample_path, dest)
             active_pred = predict_mri(dest)
-            active_gradcam = generate_gradcam(dest)
-            active_gradcam['original_url'] = '/uploads/sample_Te-gl_0015.jpg'
-            active_file = '/uploads/sample_Te-gl_0015.jpg'
+            active_gradcam = generate_gradcam(dest, target_class_idx=active_pred.get('class_index'))
+            active_gradcam['original_url'] = f"/uploads/{filename}"
+            active_file = f"/uploads/{filename}"
 
     return render_template(
         'explainable_ai.html',
@@ -189,9 +190,10 @@ def test_sample(tumor_type):
     if tumor_type in SAMPLE_IMAGES:
         src = SAMPLE_IMAGES[tumor_type]
         if os.path.exists(src):
-            dest = os.path.join(app.config['UPLOAD_FOLDER'], f"sample_{src}")
+            filename = f"sample_{tumor_type}.jpg"
+            dest = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             shutil.copyfile(src, dest)
-            return handle_upload(custom_file_location=dest, original_filename=f"sample_{src}")
+            return handle_upload(custom_file_location=dest, original_filename=filename)
     return redirect(url_for('analysis'))
 
 @app.route('/uploads/<filename>')

@@ -447,23 +447,36 @@
 }
 
 /* TYPING INDICATOR */
+.typing-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 0;
+}
+
 .typing-dots {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 6px 0;
+    gap: 5px;
 }
 
 .typing-dot {
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
-    background: var(--muted);
+    background: var(--primary);
     animation: typing 1.4s infinite ease-in-out;
 }
 
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
 .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.typing-status-text {
+    font-size: 12.5px;
+    color: var(--muted);
+    font-style: italic;
+    letter-spacing: 0.2px;
+}
 
 @keyframes typing {
     0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }

@@ -94,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Helper: show typing indicator
+    // Helper: show typing indicator with realistic deliberation status
     function showTypingIndicator() {
         const typingDiv = document.createElement("div");
         typingDiv.className = "chat-msg bot-msg typing-msg";
@@ -102,10 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
         typingDiv.innerHTML = `
             <div class="msg-avatar"><i class="fa-solid fa-user-doctor"></i></div>
             <div class="msg-bubble">
-                <div class="typing-dots">
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
-                    <span class="typing-dot"></span>
+                <div class="typing-container">
+                    <div class="typing-dots">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                    <span class="typing-status-text">Reviewing clinical care guidelines...</span>
                 </div>
             </div>
         `;
@@ -118,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (ind) ind.remove();
     }
 
-    // Send query to /api/chat
+    // Send query to /api/chat with realistic AI response timing
     async function handleSend(userText) {
         if (!userText || !userText.trim()) return;
 
@@ -130,16 +133,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         showTypingIndicator();
 
+        // Realistic clinical AI deliberation delay (1.5s to 2.2s)
+        const deliberationDelay = new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 700));
+
         try {
             const contextVal = chatContext ? chatContext.value : "";
-            const res = await fetch("/api/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    message: cleanText,
-                    context: contextVal
-                })
-            });
+            const [res] = await Promise.all([
+                fetch("/api/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        message: cleanText,
+                        context: contextVal
+                    })
+                }),
+                deliberationDelay
+            ]);
 
             removeTypingIndicator();
 

@@ -51,10 +51,10 @@ CLASS_COLORS = {
 }
 
 SAMPLE_IMAGES = {
-    'glioma': 'Te-gl_0015.jpg',
-    'meningioma': 'Te-meTr_0001.jpg',
-    'notumor': 'Te-noTr_0004.jpg',
-    'pituitary': 'Te-piTr_0003.jpg'
+    'glioma': os.path.join('dataset', 'Testing', 'glioma', 'Te-gl_1.jpg'),
+    'meningioma': os.path.join('dataset', 'Testing', 'meningioma', 'Te-aug-me_1.jpg'),
+    'notumor': os.path.join('dataset', 'Testing', 'notumor', 'Te-no_1.jpg'),
+    'pituitary': os.path.join('dataset', 'Testing', 'pituitary', 'Te-pi_1.jpg')
 }
 
 # Hex colors for Chart.js
@@ -153,6 +153,7 @@ def predict_mri(image_path):
 
     return {
         'top_key': top_label,
+        'class_index': pred_idx,
         'result': CLASS_DISPLAY[top_label],
         'confidence': f"{confidence * 100:.2f}%",
         'confidence_val': round(confidence * 100, 2),
