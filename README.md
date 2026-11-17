@@ -1,260 +1,248 @@
-# 🧠 NeuroScan AI | Clinical Brain MRI Diagnostic & Interpretability Platform
+# 🧠 NeuroScan AI — Brain Tumor Detection & Analysis with Grad-CAM
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.12" />
-  <img src="https://img.shields.io/badge/TensorFlow-2.x-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white" alt="TensorFlow" />
-  <img src="https://img.shields.io/badge/Keras-VGG16-D00000?style=for-the-badge&logo=keras&logoColor=white" alt="Keras" />
-  <img src="https://img.shields.io/badge/Flask-3.x-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
-  <img src="https://img.shields.io/badge/Grad--CAM-Explainable_AI-2563EB?style=for-the-badge" alt="Grad-CAM" />
-  <img src="https://img.shields.io/badge/Accuracy-90.0%25-16A34A?style=for-the-badge" alt="Accuracy 90%" />
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License MIT" />
+  <img src="https://img.shields.io/badge/Python-3.12-blue?style=flat-square&logo=python&logoColor=white" alt="Python 3.12" />
+  <img src="https://img.shields.io/badge/TensorFlow-2.x-orange?style=flat-square&logo=tensorflow&logoColor=white" alt="TensorFlow" />
+  <img src="https://img.shields.io/badge/Model-VGG16%20Transfer%20Learning-red?style=flat-square" alt="VGG16" />
+  <img src="https://img.shields.io/badge/Backend-Flask-black?style=flat-square&logo=flask&logoColor=white" alt="Flask" />
+  <img src="https://img.shields.io/badge/Explainability-Grad--CAM-blueviolet?style=flat-square" alt="Grad-CAM" />
+  <img src="https://img.shields.io/badge/Test%20Accuracy-90.0%25-green?style=flat-square" alt="Accuracy 90%" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=flat-square" alt="License MIT" />
+</p>
+
+An end-to-end web application that classifies brain MRI scans into four categories, highlights tumor regions using **Grad-CAM heatmaps**, and provides a patient-friendly **AI Care Assistant** with reliable health information.
+
+---
+
+## 💡 Why We Built This
+
+Most deep learning models for medical imaging are "black boxes" — they take an image, output a prediction like *"Glioma: 97%"*, and give zero indication of how they reached that conclusion. In healthcare, doctors can't just trust a percentage; they need to see *where* the model is looking to confirm it isn't making decisions based on image noise, skull thickness, or hospital watermarks.
+
+We built **NeuroScan AI** to combine:
+1. **Accurate Classification:** Fine-tuned VGG16 transfer learning model reaching **90.0% test accuracy**.
+2. **Visual Explainability:** Authentic Grad-CAM heatmaps showing the exact brain regions influencing the prediction.
+3. **Patient-Centric Guidance:** An AI Care Assistant providing clear, non-technical explanations of tumor types, treatments, and safety precautions based on NCI and WHO guidelines.
+
+---
+
+## 🔬 Visualizing What the Model Sees (Grad-CAM)
+
+When a scan is uploaded, our pipeline computes gradients from the final convolutional layer (`block5_conv3`) to generate a class activation map. This shows where the model placed its attention.
+
+<p align="center">
+  <img src="docs/images/gradcam_triplet_comparison.jpg" alt="Grad-CAM Saliency Triplet" width="100%" />
+</p>
+<p align="center">
+  <em>Figure 1: (Left) Original patient axial MRI scan, (Middle) Grad-CAM activation heatmap using the JET colormap, (Right) Heatmap blended onto the MRI scan (&alpha; = 0.42).</em>
 </p>
 
 ---
 
-## 📖 Executive Summary
+## 🖼️ How the Model Behaves Across All 4 Classes
 
-**NeuroScan AI** is an enterprise-grade medical imaging intelligence platform that combines **VGG16 Deep Transfer Learning** for 4-class brain tumor classification, mathematical **Grad-CAM (Gradient-Weighted Class Activation Mapping)** for visual explainability, empirical benchmarking, and an **AI Brain Tumor Care Assistant** providing educational guidance, treatment options, daily safety precautions, emergency red-flag triage, and rehabilitation roadmaps.
-
-Developed for academic researchers, clinicians, and computer vision engineers, the platform emphasizes **transparency**, **clinical rigor**, and **patient-centered communication**.
-
----
-
-## 🔬 Explainable AI (Grad-CAM) Visual Saliency
-
-The core diagnostic engine features a mathematically rigorous Grad-CAM implementation that visualizes the convolutional features directly influencing the model's classification.
-
-<p align="center">
-  <img src="docs/images/gradcam_triplet_comparison.jpg" alt="Grad-CAM Multi-Modal Visual Saliency Triplet" width="100%" />
-</p>
-<p align="center">
-  <em>Figure 1: Explainable AI Multi-Modal Triplet — (Left) Raw Patient Axial T1-CE MRI Scan, (Middle) Pure Grad-CAM Activation Heatmap using Clinical JET Colormap, (Right) High-Resolution Alpha Blend Overlay ($\alpha = 0.42$).</em>
-</p>
-
----
-
-## 🖼️ Four-Class Empirical Saliency Gallery
-
-NeuroScan AI evaluates scans across four distinct pathological cohorts. Below is an empirical demonstration of Grad-CAM attention maps generated across all four classes:
+We evaluated the system across four conditions. Here are sample Grad-CAM outputs for each class:
 
 <p align="center">
   <img src="docs/images/all_classes_montage.jpg" alt="All Classes Grad-CAM Montage" width="100%" />
 </p>
 <p align="center">
-  <em>Figure 2: Empirical Grad-CAM Overlays Across All Diagnostic Cohorts (Glioma, Meningioma, Pituitary Adenoma, and Healthy Brain).</em>
+  <em>Figure 2: Attention maps across Glioma, Meningioma, Pituitary tumor, and Healthy scans. Notice how the model focuses specifically on the lesion area while keeping attention dispersed on healthy tissue.</em>
 </p>
 
----
+### Class Comparison Summary
 
-## 🧠 Diagnostic Pathologies & Clinical Characteristics
-
-| Diagnostic Category | Raw MRI Scan | Grad-CAM Saliency Overlay | Anatomical Origin & Clinical Features |
+| Tumor Category | Raw Scan | Model Attention (Overlay) | What it is in simple terms |
 | :--- | :---: | :---: | :--- |
-| **Glioma Neoplasm** | <img src="docs/images/glioma_mri.jpg" width="120" /> | <img src="docs/images/glioma_overlay.jpg" width="120" /> | **Origin:** Glial support cells (astrocytes, oligodendrocytes).<br>**Features:** Intra-axial, infiltrative lesion with indistinct margins and mass effect. Graded WHO II to IV (Glioblastoma / GBM). |
-| **Meningioma Neoplasm** | <img src="docs/images/meningioma_mri.jpg" width="120" /> | <img src="docs/images/meningioma_overlay.jpg" width="120" /> | **Origin:** Arachnoid cap cells of the meninges.<br>**Features:** Predominantly benign (85–90% Grade I), well-circumscribed extra-axial lesion causing focal cortical compression. |
-| **Pituitary Adenoma** | <img src="docs/images/pituitary_mri.jpg" width="120" /> | <img src="docs/images/pituitary_overlay.jpg" width="120" /> | **Origin:** Anterior pituitary gland within the sella turcica.<br>**Features:** Endocrine-active (prolactin, GH, ACTH) or non-functioning; expands superiorly to compress the optic chiasm. |
-| **Healthy (No Tumor)** | <img src="docs/images/notumor_mri.jpg" width="120" /> | <img src="docs/images/notumor_overlay.jpg" width="120" /> | **Origin:** Physiological brain parenchyma.<br>**Features:** Symmetrical ventricular contours, intact midline alignment, no radiological evidence of mass effect, midline shift, or edema. |
+| **Glioma** | <img src="docs/images/glioma_mri.jpg" width="110" /> | <img src="docs/images/glioma_overlay.jpg" width="110" /> | Starts inside the brain tissue itself (glial cells). Tends to have irregular, infiltrative edges that blend into surrounding tissue. |
+| **Meningioma** | <img src="docs/images/meningioma_mri.jpg" width="110" /> | <img src="docs/images/meningioma_overlay.jpg" width="110" /> | Grows on the protective membranes (meninges) covering the brain. Usually non-cancerous, pressing inward on the brain. |
+| **Pituitary Tumor** | <img src="docs/images/pituitary_mri.jpg" width="110" /> | <img src="docs/images/pituitary_overlay.jpg" width="110" /> | Grows in the pituitary gland at the base of the skull. Often causes hormonal imbalances and presses on the optic nerve. |
+| **No Tumor (Healthy)** | <img src="docs/images/notumor_mri.jpg" width="110" /> | <img src="docs/images/notumor_overlay.jpg" width="110" /> | Normal brain anatomy with clear, symmetrical ventricles, intact midline, and no abnormal mass or swelling. |
 
 ---
 
-## 🌟 Key Platform Capabilities
+## ✨ Features
 
-### 1. VGG16 Deep Transfer Learning Backbone
-- **Pretrained Weights:** ImageNet initialization with input resolution $128 \times 128 \times 3$.
-- **Staged Domain Adaptation:** Foundational blocks (1–4) remain frozen while the final convolutional block (`block5_conv1`, `block5_conv2`, `block5_conv3`) is fine-tuned with a low learning rate ($1 \times 10^{-4}$) to capture micro-textural brain tissue variations.
-- **Classification Head:** Global Flattening $\rightarrow$ Batch Normalization $\rightarrow$ Dropout(0.3) $\rightarrow$ Dense(256, ReLU) $\rightarrow$ Dropout(0.2) $\rightarrow$ 4-way Softmax.
-
-### 2. Multi-Modal Interactive Image Viewer
-- Smooth **3-way view toggle** in the web interface:
-  - **Original MRI:** Unaltered high-resolution scan.
-  - **Pure Heatmap:** Normalized spatial attention map with JET colormap.
-  - **Grad-CAM Overlay:** Alpha-blended visualization ($42\%$ heatmap + $58\%$ MRI scan).
-- Full scan metadata inspection (file size, detected resolution, input tensor specs).
-
-### 3. Interactive Prediction Analytics (Chart.js)
-- Calibrated 4-class differential probability distribution bar chart using the actual output softmax vector.
-- Circular progress score indicator and color-coded status badges.
-- One-click sample toolbar to test validated scans in 1 click.
-
-### 4. Empirical Model Performance Dashboard
-- Real benchmarks computed on the 1,600-scan holdout test cohort:
-  - **Global Test Accuracy:** **90.00%**
-  - **Weighted Precision:** **89.99%**
-  - **Weighted Recall:** **90.00%**
-  - **Weighted F1-Score:** **89.83%**
-- Interactive training vs. validation accuracy curve across epochs.
-- Interactive training vs. validation loss curve.
-- Empirical $4 \times 4$ confusion matrix heatmap.
-- Standardized scikit-learn classification report.
-
-### 5. AI Brain Tumor Care Assistant (`/care-assistant`)
-- **Interactive Health Chatbot:** Answers natural language health and care queries empathetically. Sourced from the **National Cancer Institute (NCI)**, **World Health Organization (WHO)**, and **American Cancer Society (ACS)**.
-- **Post-Prediction Context Hook:** When an MRI scan is analyzed, the user can click **"Explore Patient Care & Guidance"** to launch the assistant pre-loaded with educational context regarding that pathology.
-- **Treatment Modalities Explorer:** Detailed guides on Surgery (craniotomy, biopsy, 5-ALA fluorescence), Radiation Therapy (SRS, IMRT, Proton), Chemotherapy (Temozolomide), Targeted Therapy, Active Surveillance, and Palliative Care.
-- **Safety Precautions:** Anti-seizure medication adherence, driving safety restrictions, fall prevention, balanced nutrition, and an explicit warning that **no food, supplement, or home remedy cures brain tumors**.
-- **Emergency Triage ("When to Seek Medical Help"):** Clear distinction between prompt doctor evaluation and immediate emergency warning signs (first seizure, status epilepticus, acute paralysis, loss of consciousness).
-- **Questions for the Doctor:** 10-point checklist for clinical oncology consultations.
-- **Dual-Mode Engine:** Fully operational offline out-of-the-box; supports optional `$env:GEMINI_API_KEY` for live generative responses.
+- **Drag-and-Drop MRI Upload:** Simple, clean web interface to upload any standard MRI image (PNG, JPG, JPEG).
+- **3-Way Multi-Modal Viewer:** Seamlessly toggle between the *Original Scan*, *Pure Heatmap*, and *Superimposed Overlay* on the analysis page.
+- **Dynamic Probability Breakdown:** Interactive Chart.js bar chart displaying the confidence scores across all four classes.
+- **AI Brain Tumor Care Assistant:**
+  - Clear explanations of the diagnosed condition.
+  - Common treatment options (Surgery, Radiation, Chemotherapy, Targeted Therapy).
+  - Daily precautions (anti-seizure guidance, fall prevention, driving safety).
+  - Emergency warning signs ("When to call an ambulance").
+  - 10 recommended questions to ask your oncologist.
+  - Built-in chatbot that works **100% offline** (with optional live Gemini API key support).
+- **Model Performance Dashboard:** Live view of the confusion matrix, classification report, and training/validation loss and accuracy curves.
 
 ---
 
-## 📊 Empirical Evaluation & Confusion Matrix
+## 📊 Results & Performance
 
-Evaluation performed on holdout test cohort:
+We evaluated the model on a strict **holdout test set of 1,600 scans** (400 per class) that were never seen during training:
 
-| Metric | Score | Clinical Relevance |
+| Metric | Score | Note |
 | :--- | :---: | :--- |
-| **Accuracy** | **90.00%** | Overall correct classifications across holdout cohort |
-| **Weighted Precision** | **89.99%** | Positive predictive reliability across all 4 classes |
-| **Weighted Recall** | **90.00%** | Sensitivity in catching pathological cases |
-| **Weighted F1-Score** | **89.83%** | Harmonic balance between precision and recall |
+| **Overall Accuracy** | **90.00%** | 1,440 out of 1,600 correct predictions |
+| **Weighted Precision** | **89.99%** | High positive prediction reliability |
+| **Weighted Recall** | **90.00%** | Crucial for minimizing missed cases (false negatives) |
+| **Weighted F1-Score** | **89.83%** | Balanced performance across all four classes |
 
-### Confusion Matrix ($N = 400$ Evaluated Test Scans)
+### Breakdown by Category (Sample Evaluation of 400 Test Images)
+
+| Category | Precision | Recall | F1-Score | Analysis |
+| :--- | :---: | :---: | :---: | :--- |
+| **Pituitary** | 98.0% | 97.0% | **97.5%** | Highest accuracy due to distinct location in the sella turcica. |
+| **No Tumor** | 90.0% | 99.0% | **94.3%** | Almost zero false alarms on healthy scans (99% recall). |
+| **Meningioma** | 84.6% | 88.0% | **86.3%** | Good detection of extra-axial membrane tumors. |
+| **Glioma** | 87.4% | 76.0% | **81.3%** | Most challenging class; occasionally confused with meningiomas due to fuzzy borders. |
+
+### Confusion Matrix
+
 ```text
-                       PREDICTED
-                Pituitary  Glioma  No Tumor  Meningioma
-TRUE:
-Pituitary          97        0        1          2
-Glioma              1       76        9         14
-No Tumor            0        1       99          0
-Meningioma          1       10        1         88
+                        PREDICTED CLASS
+                 Pituitary  Glioma  No Tumor  Meningioma
+ACTUAL:
+Pituitary           97        0        1          2
+Glioma               1       76        9         14
+No Tumor             0        1       99          0
+Meningioma           1       10        1         88
 ```
 
-### Classification Report
-```text
-               precision    recall  f1-score   support
-   pituitary     0.9798    0.9700    0.9749       100
-      glioma     0.8736    0.7600    0.8128       100
-     notumor     0.9000    0.9900    0.9429       100
-  meningioma     0.8462    0.8800    0.8627       100
-
-    accuracy                         0.9000       400
-   macro avg     0.8999    0.9000    0.8983       400
-weighted avg     0.8999    0.9000    0.8983       400
-```
+> **Honest takeaway:** The primary area of confusion is between **Glioma and Meningioma** (14 gliomas predicted as meningiomas). In clinical practice, distinguishing between an infiltrative glioma and a parasagittal meningioma on a single 2D contrast slice is difficult even for radiologists, which is why real hospitals use multi-planar 3D views and perfusion MRI.
 
 ---
 
-## 📐 Grad-CAM Mathematical Formulation
+## 🛠️ How It Works Under the Hood
 
-Grad-CAM extracts visual explanations by computing gradients of the target class score with respect to convolutional feature maps:
+### 1. Image Preprocessing Pipeline
+1. Scan is uploaded and converted to 3-channel RGB.
+2. Bilinearly resized to $128 \times 128$ pixels.
+3. Pixel values scaled from $[0, 255]$ to $[0.0, 1.0]$.
+4. Tensor reshaped to `(1, 128, 128, 3)` for model inference.
 
-1. **Gradient Computation:**
-   $$\frac{\partial y^c}{\partial A^k}$$
-   Where $y^c$ is the logit/score for class $c$, and $A^k$ represents the $k$-th feature map of layer `block5_conv3`.
+### 2. VGG16 Transfer Learning
+- **Base:** VGG16 pre-trained on ImageNet.
+- **Frozen Layers:** Blocks 1 through 4 are frozen to retain general low-level edge and texture detectors.
+- **Fine-Tuning:** Block 5 is unfrozen and trained with a low learning rate ($1 \times 10^{-4}$) to adapt specifically to brain tissue features.
+- **Classifier Head:** Flatten $\rightarrow$ BatchNormalization $\rightarrow$ Dropout(0.3) $\rightarrow$ Dense(256, ReLU) $\rightarrow$ BatchNormalization $\rightarrow$ Dropout(0.2) $\rightarrow$ Dense(4, Softmax).
 
-2. **Neuron Importance Weights ($\alpha_k^c$):**
-   $$\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{ij}^k}$$
-   Global average pooling over spatial dimensions $i$ and $j$ calculates the channel importance.
-
-3. **Rectified Linear Unit (ReLU) Map:**
+### 3. Grad-CAM Calculation
+1. Extract the activations $A^k$ of the final conv layer (`block5_conv3`).
+2. Compute the gradient of the predicted class score $y^c$ with respect to each feature map: $\frac{\partial y^c}{\partial A^k}$.
+3. Average the gradients across spatial dimensions to get channel importance weights $\alpha_k^c$.
+4. Take a weighted sum of the feature maps and pass through **ReLU** (retaining only features that positively contributed to that class):
    $$L_{\text{Grad-CAM}}^c = \text{ReLU}\left(\sum_{k} \alpha_k^c A^k\right)$$
-   Preserves features with a positive impact on class $c$ and discards negative background noise.
-
-4. **Bilinear Upsampling & JET Colormap:**
-   The normalized matrix $[0.0, 1.0]$ is bilinearly upsampled to the original dimensions $(W \times H)$, mapped through the JET spectrum, and blended:
-   $$I_{\text{overlay}} = 0.42 \cdot I_{\text{heatmap}} + 0.58 \cdot I_{\text{MRI}}$$
+5. Normalize to $[0, 1]$, upsample to original image size, apply the JET colormap, and blend at $\alpha = 0.42$.
 
 ---
 
-## 📁 Repository Structure
+## ❓ FAQ: Why do some MRI images downloaded from Google give wrong answers?
+
+If you download a random brain MRI from Google Images, the model might occasionally give an unexpected prediction. Here is why:
+
+1. **Slice Orientation:** Our model was trained exclusively on **axial (horizontal top-down) slices**. Google Images often has **sagittal (side view)** or **coronal (face-on)** slices, which have entirely different anatomy.
+2. **MRI Sequence Type:** The dataset uses **T1-weighted contrast-enhanced** scans where fluid is dark and tumors show up bright. If you upload a **T2 or FLAIR** scan, normal fluid in the brain looks bright white, which can trick the model.
+3. **Annotations & Watermarks:** Medical websites often add hospital logos, text markers ("L", "R", patient IDs), or white borders. These change the image statistics and confuse convolutional filters.
+
+---
+
+## 📁 Project Structure
 
 ```text
 brain_tumor/
-├── app.py                             # Clean Flask entry point launcher
-├── main.py                            # Flask application routes & REST endpoints
-├── train.py                           # Model training and fine-tuning pipeline
-├── predict.py                         # CLI inference script
+├── app.py                          # Flask entry point launcher
+├── main.py                         # Route definitions and REST API endpoints
+├── train.py                        # Model training and fine-tuning script
+├── predict.py                      # Quick CLI prediction script
 ├── models/
-│   └── model.h5                       # Trained VGG16 model weights
+│   └── model.h5                    # Trained VGG16 model weights (~64 MB)
 ├── services/
-│   ├── __init__.py
-│   ├── prediction_service.py          # Model caching, preprocessing & inference
-│   ├── gradcam_service.py             # Grad-CAM backprop, JET mapping & overlay
-│   ├── evaluation_service.py          # Metrics, confusion matrix & history loader
-│   └── ai_care_assistant.py           # Sourced NCI/WHO/ACS health engine & chatbot
+│   ├── prediction_service.py       # Image loading, preprocessing & model inference
+│   ├── gradcam_service.py          # Grad-CAM backprop, JET colormap & overlay blending
+│   ├── evaluation_service.py       # Metrics loader & confusion matrix provider
+│   └── ai_care_assistant.py        # Clinical knowledge base & offline NLP chatbot
 ├── templates/
-│   ├── base.html                      # Healthcare SaaS master layout & navigation
-│   ├── index.html                     # Dashboard forwarding template
-│   ├── dashboard.html                 # Main dashboard with KPIs and fast upload
-│   ├── analysis.html                  # Scan analysis, Chart.js, Grad-CAM & Care CTA
-│   ├── care_assistant.html            # AI Care Assistant: Chatbot, Treatments, Precautions
-│   ├── explainable_ai.html            # Grad-CAM mathematics & deep-dive viewer
-│   ├── model_performance.html         # Empirical curves & classification report
-│   └── about.html                     # VGG16 architecture breakdown & limitations
+│   ├── base.html                   # Master layout with navbar and footer
+│   ├── dashboard.html              # Main dashboard with stats & upload dropzone
+│   ├── analysis.html               # Prediction results, Grad-CAM viewer & Chart.js
+│   ├── care_assistant.html         # Educational guidance, precautions & chatbot
+│   ├── explainable_ai.html         # Grad-CAM deep dive & technical viewer
+│   ├── model_performance.html      # Confusion matrix & benchmark graphs
+│   └── about.html                  # Model architecture & medical context
 ├── static/
 │   ├── css/
-│   │   ├── style.css                  # Main healthcare SaaS design system
-│   │   └── care_assistant.css         # Care Assistant & Chatbot layout styling
-│   ├── js/
-│   │   ├── care_assistant.js          # Live chat, suggested question chips & tabs
-│   │   ├── main.js                    # Upload validation & drag-and-drop
-│   │   ├── heatmap.js                 # 3-way multi-modal viewer controller
-│   │   └── charts.js                  # Chart.js probability, accuracy & loss graphs
-│   └── results/                       # Generated Grad-CAM heatmaps & overlays
+│   │   ├── style.css               # Main dashboard UI stylesheet
+│   │   └── care_assistant.css      # Care Assistant layout & chat styles
+│   └── js/
+│       ├── main.js                 # Drag-and-drop & file validation
+│       ├── heatmap.js              # 3-way toggle image viewer
+│       ├── charts.js               # Chart.js probability bars & performance graphs
+│       └── care_assistant.js       # Chat message handler & quick question chips
 ├── docs/
-│   └── images/                        # High-resolution documentation showcase images
+│   └── images/                     # Figures used in this README
 ├── reports/
-│   ├── evaluation_metrics.json        # Test set benchmarks & confusion matrix
-│   └── training_history.json          # Training & validation epoch curves
-├── dataset/                           # Kaggle dataset (Training/ & Testing/)
-├── uploads/                           # Temporary uploaded scan storage
-├── requirements.txt                   # Project dependencies
-└── README.md                          # Documentation
+│   ├── evaluation_metrics.json     # Test cohort metrics & confusion matrix data
+│   └── training_history.json       # Epoch-by-epoch loss & accuracy history
+├── dataset/                        # Kaggle dataset (Training/ and Testing/)
+├── requirements.txt                # Python dependencies
+└── VIVA_QUESTIONS_AND_ANSWERS.md   # Top 40 viva questions and answers guide
 ```
 
 ---
 
-## 🚀 Quickstart & Installation (Local Execution in VS Code)
+## 🚀 Getting Started
 
-### 1. Open Terminal in VS Code
-Press <kbd>Ctrl</kbd> + <kbd>`</kbd> to open the integrated terminal in the project directory:
-```powershell
-cd d:\dev\AI_ML\brain_tumor
+### 1. Prerequisites
+- Python 3.10 to 3.12 installed.
+- VS Code (or your preferred editor).
+
+### 2. Clone the Repository
+```bash
+git clone https://github.com/genus-lang/brain_tumor.git
+cd brain_tumor
 ```
 
-### 2. Activate the Virtual Environment
+### 3. Set Up Virtual Environment
 ```powershell
+# Windows (PowerShell)
+python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+
+# Linux / macOS
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 3. Verify Dependencies
-```powershell
+### 4. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 4. (Optional) Configure Gemini API Key
-The AI Care Assistant works 100% offline out-of-the-box using the built-in NCI/WHO/ACS knowledge engine. If you want to enable live Gemini generative responses, set your API key:
-```powershell
-$env:GEMINI_API_KEY="your-api-key-here"
-```
-
-### 5. Launch the NeuroScan AI Web Server
-Run either launcher:
-```powershell
+### 5. Run the Application
+```bash
 python app.py
-# or
-python main.py
+```
+Open your browser and navigate to: **`http://127.0.0.1:5000`**
+
+### 6. (Optional) Enable Live Gemini Responses
+The AI Care Assistant works completely offline out-of-the-box. If you'd like to enable live AI responses using Google Gemini:
+```powershell
+# Windows PowerShell
+$env:GEMINI_API_KEY="your-gemini-api-key"
+
+# Linux / macOS
+export GEMINI_API_KEY="your-gemini-api-key"
 ```
 
-### 6. Open in Browser
-Visit **[http://127.0.0.1:5000](http://127.0.0.1:5000)** to explore:
-- **Dashboard (`/`):** High-level metrics and fast upload.
-- **MRI Analysis (`/analysis`):** Upload an MRI scan to view the predicted class, Chart.js probability distribution, Grad-CAM overlay, and click **"Explore Patient Care & Guidance"**.
-- **Care Assistant (`/care-assistant`):** Interactive AI chatbot, treatment explorer, safety precautions, emergency triage, and recovery timelines.
-- **Explainable AI (`/explainable-ai`):** Multi-modal viewer with Grad-CAM mathematical formulation.
-- **Model Performance (`/performance`):** Empirical training curves, confusion matrix, and classification report.
+---
+
+## 🔒 Privacy & Local Processing
+- All image processing, neural network inference, and Grad-CAM generation run **100% locally on your machine**.
+- No patient scans or personal data are sent to external cloud servers.
+- Uploaded files are stored in a local temporary folder (`uploads/`) and can be cleared at any time.
 
 ---
 
-## 🔒 Privacy & Data Ethics
+## ⚖️ Disclaimer
 
-- **Zero External Telemetry:** All deep learning tensor calculations and Grad-CAM image rendering are processed locally on your workstation.
-- **No Third-Party Transmission:** Uploaded patient MRI scans are not transmitted to external cloud servers or commercial AI APIs.
-- **Non-Invasive Caching:** Uploaded test files are stored in a local ephemeral cache (`uploads/`) and can be safely purged at any time.
-
----
-
-## ⚖️ Important Medical Disclaimer
-
-> **Important:** NeuroScan AI is an academic and research-oriented brain MRI image classification and educational health project. Its deep learning predictions, Grad-CAM visual heatmaps, and AI Care Assistant responses are educational tools and do not constitute clinical diagnoses, medical advice, surgical plans, or prescriptions. Brain tumor management requires specialized multi-parametric evaluation by board-certified radiologists, neurosurgeons, and neuro-oncologists. Always consult qualified healthcare professionals for medical evaluation.
+> **Medical Disclaimer:** NeuroScan AI is an educational and academic research project. The predictions, Grad-CAM visualizations, and Care Assistant outputs provided by this software are for informational and research purposes only. They **do not** constitute a clinical diagnosis, medical advice, or treatment plan. Always consult a qualified physician or neuro-oncologist for professional medical evaluation.
