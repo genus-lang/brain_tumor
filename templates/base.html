@@ -34,19 +34,56 @@
                 </div>
             </a>
 
-            <ul class="nav-links">
-                <li><a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">Dashboard</a></li>
-                <li><a href="/analysis" class="nav-link {% if active_page == 'analysis' %}active{% endif %}">MRI Analysis</a></li>
-                <li><a href="/explainable-ai" class="nav-link {% if active_page == 'explainable_ai' %}active{% endif %}">Explainable AI</a></li>
-                <li><a href="/care-assistant" class="nav-link {% if active_page == 'care_assistant' %}active{% endif %}"><i class="fa-solid fa-heart-pulse text-danger me-1"></i> Care Assistant</a></li>
-                <li><a href="/performance" class="nav-link {% if active_page == 'performance' %}active{% endif %}">Model Performance</a></li>
-                <li><a href="/about" class="nav-link {% if active_page == 'about' %}active{% endif %}">About Project</a></li>
+            <!-- Mobile Hamburger Toggle -->
+            <button class="nav-toggle" id="navToggle" type="button" aria-label="Toggle navigation">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Navigation Links -->
+            <ul class="nav-links" id="navLinks">
+                <li>
+                    <a href="/" class="nav-link {% if active_page == 'dashboard' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-line nav-icon"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/analysis" class="nav-link {% if active_page == 'analysis' %}active{% endif %}">
+                        <i class="fa-solid fa-microscope nav-icon"></i>
+                        <span>MRI Analysis</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/explainable-ai" class="nav-link {% if active_page == 'explainable_ai' %}active{% endif %}">
+                        <i class="fa-solid fa-fire nav-icon"></i>
+                        <span>Explainable AI</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/care-assistant" class="nav-link care-link {% if active_page == 'care_assistant' %}active{% endif %}">
+                        <i class="fa-solid fa-heart-pulse text-danger nav-icon"></i>
+                        <span>Care Assistant</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/performance" class="nav-link {% if active_page == 'performance' %}active{% endif %}">
+                        <i class="fa-solid fa-chart-pie nav-icon"></i>
+                        <span>Model Performance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/about" class="nav-link {% if active_page == 'about' %}active{% endif %}">
+                        <i class="fa-solid fa-circle-info nav-icon"></i>
+                        <span>About Project</span>
+                    </a>
+                </li>
             </ul>
 
+            <!-- Right Status Badge -->
             <div class="nav-right">
                 <div class="status-indicator">
                     <div class="pulse-dot"></div>
-                    <span>VGG16 &bull; Grad-CAM Active</span>
+                    <span class="status-text">VGG16 &bull; <span class="status-text-extra">Grad-CAM </span>Active</span>
                 </div>
             </div>
         </div>

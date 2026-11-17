@@ -152,5 +152,38 @@ document.addEventListener("DOMContentLoaded", () => {
             bar.style.width = Math.max(0, Math.min(100, isNaN(targetVal) ? 0 : targetVal)) + "%";
         }, 250);
     });
+
+    // Mobile Navbar Hamburger Toggle
+    const navToggle = document.getElementById("navToggle");
+    const navLinks = document.getElementById("navLinks");
+    if (navToggle && navLinks) {
+        navToggle.addEventListener("click", () => {
+            const isOpen = navLinks.classList.toggle("open");
+            navToggle.classList.toggle("active", isOpen);
+            const icon = navToggle.querySelector("i");
+            if (icon) {
+                if (isOpen) {
+                    icon.classList.remove("fa-bars");
+                    icon.classList.add("fa-xmark");
+                } else {
+                    icon.classList.remove("fa-xmark");
+                    icon.classList.add("fa-bars");
+                }
+            }
+        });
+
+        // Close mobile menu if clicked outside
+        document.addEventListener("click", (e) => {
+            if (!navToggle.contains(e.target) && !navLinks.contains(e.target) && navLinks.classList.contains("open")) {
+                navLinks.classList.remove("open");
+                navToggle.classList.remove("active");
+                const icon = navToggle.querySelector("i");
+                if (icon) {
+                    icon.classList.remove("fa-xmark");
+                    icon.classList.add("fa-bars");
+                }
+            }
+        });
+    }
 });
 
