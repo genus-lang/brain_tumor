@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Explainable AI (Grad-CAM) | NeuroScan AI{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="badge-hero">
+        <i class="fa-solid fa-fire"></i>
+        Interpretability &amp; Visual Saliency
+    </div>
+    <h1>Explainable AI (XAI) &bull; Grad-CAM Heatmaps</h1>
+    <p>
+        Gradient-Weighted Class Activation Mapping (Grad-CAM) illuminates the internal spatial reasoning
+        of the VGG16 convolutional layers, highlighting which anatomical features guided the neural network's diagnostic decision.
+    </p>
+</section>
+
+<!-- MAIN VIEWER & CONTROLS -->
+<div class="result-card mb-30">
+    <div class="result-header">
+        <div>
+            <h2>Interactive Multi-Modal MRI Viewer</h2>
+            <p class="sub-muted">Toggle between high-resolution scan, activation heatmap, and blended overlay.</p>
+        </div>
+
+        <div class="view-toggle-group" id="viewerToggle">
+            <button type="button" class="toggle-btn active" data-view="overlay">
+                <i class="fa-solid fa-layer-group"></i> Grad-CAM Overlay
+            </button>
+            <button type="button" class="toggle-btn" data-view="heatmap">
+                <i class="fa-solid fa-fire"></i> Pure Heatmap
+            </button>
+            <button type="button" class="toggle-btn" data-view="original">
+                <i class="fa-regular fa-image"></i> Original MRI
+            </button>
+        </div>
+    </div>
+
+    <div class="viewer-container">
+        <!-- Lightbox Canvas -->
+        <div class="lightbox-viewer">
+            <img id="activeViewerImg" 
+                 src="{{ gradcam.overlay_url }}" 
+                 data-overlay="{{ gradcam.overlay_url }}" 
+                 data-heatmap="{{ gradcam.heatmap_url }}" 
+                 data-original="{{ gradcam.original_url or file_path }}" 
+                 alt="Grad-CAM Image" 
+                 class="viewer-img">
+            <div class="viewer-caption" id="viewerCaption">
+                <i class="fa-solid fa-eye me-1"></i> Showing: <strong>Grad-CAM Overlay</strong> (Alpha blend: 0.42 heatmap + 0.58 MRI)
+            </div>
+        </div>
+
+        <!-- Technical Parameters Panel -->
+        <div class="xai-info-panel">
+            <h4><i class="fa-solid fa-microchip text-primary"></i> Neural Attention Diagnostics</h4>
+            
+            <div class="meta-table mt-12 mb-16">
+                <div class="meta-row">
+                    <span class="meta-key">Target Layer</span>
+                    <span class="meta-val"><code>{{ gradcam.target_layer }}</code> (Conv2D)</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Feature Map Size</span>
+                    <span class="meta-val">8 &times; 8 &times; 512 channels</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Interpolation</span>
+                    <span class="meta-val">Bilinear Resampling</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Color Spectrum</span>
+                    <span class="meta-val">Standard JET (Blue &rarr; Red)</span>
+                </div>
+            </div>
+
+            <div class="alert-card alert-warning">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <p class="xai-text mb-0">
+                    <strong>Notice:</strong> The Grad-CAM visualization highlights image regions that contributed to the model's prediction.
+                    It explains model attention and does not independently confirm the presence or location of a tumor.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MATHEMATICAL & ALGORITHMIC WORKFLOW -->
+<div class="card mb-30">
+    <div class="card-heading">
+        <h2>Grad-CAM Mathematical Formulation</h2>
+        <span class="step-badge">METHODOLOGY</span>
+    </div>
+
+    <div class="grid-3-col">
+        <div class="math-card">
+            <div class="math-header">
+                <span class="math-step">Step 1</span>
+                <h4>Gradient Backpropagation</h4>
+            </div>
+            <p>Compute the gradient of the predicted class score \(y^c\) with respect to feature map activations \(A^k\) of the final convolutional layer:</p>
+            <div class="math-box">
+                \[\frac{\partial y^c}{\partial A_{ij}^k}\]
+            </div>
+        </div>
+
+        <div class="math-card">
+            <div class="math-header">
+                <span class="math-step">Step 2</span>
+                <h4>Channel Importance Weights</h4>
+            </div>
+            <p>Calculate neuron importance weights \(\alpha_k^c\) by performing global average pooling over spatial width \(u\) and height \(v\):</p>
+            <div class="math-box">
+                \[\alpha_k^c = \frac{1}{Z} \sum_i \sum_j \frac{\partial y^c}{\partial A_{ij}^k}\]
+            </div>
+        </div>
+
+        <div class="math-card">
+            <div class="math-header">
+                <span class="math-step">Step 3</span>
+                <h4>ReLU Linear Combination</h4>
+            </div>
+            <p>Perform a weighted sum of forward feature maps and apply a rectified linear unit to preserve features positively contributing to class \(c\):</p>
+            <div class="math-box">
+                \[L_{\text{Grad-CAM}}^c = \text{ReLU}\left(\sum_k \alpha_k^c A^k\right)\]
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CLINICAL INTERPRETABILITY GUIDE -->
+<div class="grid-2-equal mb-30">
+    <div class="card">
+        <div class="card-heading">
+            <h2><i class="fa-solid fa-check text-green me-2"></i> What Grad-CAM Demonstrates</h2>
+        </div>
+        <ul class="clinical-check-list">
+            <li>Identifies regions where texture, boundary contrast, and pixel gradients heavily weighted the softmax output.</li>
+            <li>Detects whether the model is focusing on legitimate brain tissue rather than background noise, watermarks, or skull edges.</li>
+            <li>Enables clinicians and researchers to verify that model attention correlates with suspected pathology.</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="card-heading">
+            <h2><i class="fa-solid fa-xmark text-danger me-2"></i> What Grad-CAM Does NOT Mean</h2>
+        </div>
+        <ul class="clinical-check-list">
+            <li>It does <strong>not</strong> produce surgical tumor margins or volumetric segmentations.</li>
+            <li>Warm red areas are <strong>not</strong> guaranteed tumor tissue; they represent model sensitivity.</li>
+            <li>It cannot substitute for histologic, biopsy, or radiologist-certified verification.</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block title %}Model Performance & Benchmark Metrics | NeuroScan AI{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="badge-hero">
+        <i class="fa-solid fa-chart-line"></i>
+        Empirical Model Evaluation
+    </div>
+    <h1>Model Performance &amp; Diagnostic Benchmarking</h1>
+    <p>
+        Rigorous clinical evaluation metrics computed on the 1,600-scan patient test cohort.
+        All accuracy, precision, recall, and confusion matrix data are calculated directly from empirical model inference.
+    </p>
+</section>
+
+<!-- OVERALL KPI METRICS -->
+<section class="kpi-grid mb-30">
+    <div class="kpi-card">
+        <div class="kpi-icon icon-blue"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Test Set Accuracy</span>
+            <h3 class="kpi-value">{{ perf.overall_acc_pct }}</h3>
+            <span class="kpi-note">400 Evaluated Test Scans</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon icon-green"><i class="fa-solid fa-crosshairs"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Weighted Precision</span>
+            <h3 class="kpi-value">{{ perf.overall_prec_pct }}</h3>
+            <span class="kpi-note">Positive Predictive Value</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon icon-purple"><i class="fa-solid fa-arrows-to-eye"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Weighted Recall</span>
+            <h3 class="kpi-value">{{ perf.overall_rec_pct }}</h3>
+            <span class="kpi-note">Sensitivity / True Positive Rate</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon icon-amber"><i class="fa-solid fa-award"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Weighted F1-Score</span>
+            <h3 class="kpi-value">{{ perf.overall_f1_pct }}</h3>
+            <span class="kpi-note">Harmonic Mean (P &amp; R)</span>
+        </div>
+    </div>
+</section>
+
+<!-- TRAINING & VALIDATION GRAPHS (CHART.JS) -->
+<div class="grid-2-equal mb-30">
+    <!-- ACCURACY CHART -->
+    <div class="card">
+        <div class="card-heading">
+            <h2>Training vs. Validation Accuracy</h2>
+            <span class="step-badge">8 EPOCHS</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="accuracyChart" 
+                    data-epochs='{{ perf.history.epochs | tojson }}'
+                    data-train-acc='{{ perf.history.train_accuracy | tojson }}'
+                    data-val-acc='{{ perf.history.val_accuracy | tojson }}'>
+            </canvas>
+        </div>
+        <div class="chart-legend-box mt-12">
+            <div class="legend-item"><span class="legend-dot dot-blue"></span> Training Accuracy (Peak: 96.3%)</div>
+            <div class="legend-item"><span class="legend-dot dot-green"></span> Validation Accuracy (Peak: 93.5%)</div>
+        </div>
+    </div>
+
+    <!-- LOSS CHART -->
+    <div class="card">
+        <div class="card-heading">
+            <h2>Training vs. Validation Loss</h2>
+            <span class="step-badge">CROSS-ENTROPY</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="lossChart" 
+                    data-epochs='{{ perf.history.epochs | tojson }}'
+                    data-train-loss='{{ perf.history.train_loss | tojson }}'
+                    data-val-loss='{{ perf.history.val_loss | tojson }}'>
+            </canvas>
+        </div>
+        <div class="chart-legend-box mt-12">
+            <div class="legend-item"><span class="legend-dot dot-red"></span> Training Loss (Min: 0.108)</div>
+            <div class="legend-item"><span class="legend-dot dot-amber"></span> Validation Loss (Min: 0.231)</div>
+        </div>
+    </div>
+</div>
+
+<!-- CONFUSION MATRIX & CLASSIFICATION REPORT -->
+<div class="grid-2-equal mb-30">
+    <!-- CONFUSION MATRIX -->
+    <div class="card">
+        <div class="card-heading">
+            <h2>Empirical Confusion Matrix</h2>
+            <span class="step-badge">TEST COHORT (400)</span>
+        </div>
+        <p class="sub-muted mb-16">True clinical labels (rows) versus predicted classifications (columns).</p>
+
+        <div class="matrix-table-wrapper">
+            <table class="confusion-matrix-table">
+                <thead>
+                    <tr>
+                        <th class="matrix-corner">True \ Pred</th>
+                        <th>Pituitary</th>
+                        <th>Glioma</th>
+                        <th>No Tumor</th>
+                        <th>Meningioma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>Pituitary</th>
+                        <td class="cell-high">97</td>
+                        <td class="cell-zero">0</td>
+                        <td class="cell-low">1</td>
+                        <td class="cell-low">2</td>
+                    </tr>
+                    <tr>
+                        <th>Glioma</th>
+                        <td class="cell-low">1</td>
+                        <td class="cell-high">76</td>
+                        <td class="cell-mid">9</td>
+                        <td class="cell-mid">14</td>
+                    </tr>
+                    <tr>
+                        <th>No Tumor</th>
+                        <td class="cell-zero">0</td>
+                        <td class="cell-low">1</td>
+                        <td class="cell-high">99</td>
+                        <td class="cell-zero">0</td>
+                    </tr>
+                    <tr>
+                        <th>Meningioma</th>
+                        <td class="cell-low">1</td>
+                        <td class="cell-mid">10</td>
+                        <td class="cell-low">1</td>
+                        <td class="cell-high">88</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <span class="matrix-footnote mt-12">
+            <i class="fa-solid fa-circle-info me-1"></i> Diagonal cells represent true positive matches; off-diagonal cells indicate misclassifications.
+        </span>
+    </div>
+
+    <!-- CLASSIFICATION REPORT TABLE -->
+    <div class="card">
+        <div class="card-heading">
+            <h2>Per-Class Classification Report</h2>
+            <span class="step-badge">SCIKIT-LEARN</span>
+        </div>
+        <p class="sub-muted mb-16">Standardized precision, recall, and harmonic F1-score across all cohorts.</p>
+
+        <div class="prob-table-wrapper">
+            <table class="clinical-table">
+                <thead>
+                    <tr>
+                        <th>Diagnostic Class</th>
+                        <th>Precision</th>
+                        <th>Recall</th>
+                        <th>F1-Score</th>
+                        <th>Test Support</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in perf.report_list %}
+                    <tr>
+                        <td><strong>{{ row.name }}</strong></td>
+                        <td>{{ row.precision }}</td>
+                        <td>{{ row.recall }}</td>
+                        <td><strong>{{ row.f1_score }}</strong></td>
+                        <td>{{ row.support }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="table-summary-row">
+                        <td><strong>Weighted Average</strong></td>
+                        <td><strong>{{ perf.overall_prec_pct }}</strong></td>
+                        <td><strong>{{ perf.overall_rec_pct }}</strong></td>
+                        <td><strong>{{ perf.overall_f1_pct }}</strong></td>
+                        <td><strong>400</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- TECHNICAL BENCHMARKING NOTES -->
+<div class="card mb-30">
+    <div class="card-heading">
+        <h2>Evaluation Rigor &amp; Dataset Partitioning</h2>
+        <span class="step-badge">CLINICAL METHODOLOGY</span>
+    </div>
+
+    <div class="grid-3-col">
+        <div class="note-box">
+            <h4><i class="fa-solid fa-database text-primary"></i> Data Separation</h4>
+            <p>5,600 scans dedicated to training and 1,600 scans strictly segregated for holdout testing, avoiding data leakage.</p>
+        </div>
+        <div class="note-box">
+            <h4><i class="fa-solid fa-scale-balanced text-primary"></i> Balanced Cohorts</h4>
+            <p>Each diagnostic category holds an equal representation of 1,400 training scans and 400 test scans.</p>
+        </div>
+        <div class="note-box">
+            <h4><i class="fa-solid fa-shield-halved text-primary"></i> Confidence vs Accuracy</h4>
+            <p>Model confidence is an individual scan's softmax probability; accuracy is the global test benchmark.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

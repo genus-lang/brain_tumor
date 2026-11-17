@@ -50,6 +50,13 @@ CLASS_COLORS = {
     'notumor': 'success'
 }
 
+SAMPLE_IMAGES = {
+    'glioma': 'Te-gl_0015.jpg',
+    'meningioma': 'Te-meTr_0001.jpg',
+    'notumor': 'Te-noTr_0004.jpg',
+    'pituitary': 'Te-piTr_0003.jpg'
+}
+
 # Hex colors for Chart.js
 CLASS_HEX_COLORS = {
     'glioma': '#dc2626',

@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | NeuroScan AI Platform{% endblock %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="badge-hero">
+        <i class="fa-solid fa-microchip"></i>
+        Enterprise Medical AI Platform
+    </div>
+    <h1>Brain MRI Diagnostic &amp; Interpretability Intelligence</h1>
+    <p>
+        NeuroScan AI integrates deep transfer learning with gradient-weighted class activation mapping (Grad-CAM)
+        to deliver transparent, explainable image classification across four key brain MRI diagnostic categories.
+    </p>
+</section>
+
+<!-- KPI METRIC CARDS -->
+<section class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon icon-blue"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Benchmark Test Accuracy</span>
+            <h3 class="kpi-value">{{ perf_data.overall_acc_pct }}</h3>
+            <span class="kpi-note">1,600 Patient Cohort</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon icon-purple"><i class="fa-solid fa-dna"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Deep Learning Model</span>
+            <h3 class="kpi-value">VGG16 Backbone</h3>
+            <span class="kpi-note">Fine-Tuned Block 5</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon icon-amber"><i class="fa-solid fa-fire-flame-curved"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Explainable AI</span>
+            <h3 class="kpi-value">Grad-CAM</h3>
+            <span class="kpi-note">Target: block5_conv3</span>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon icon-green"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="kpi-content">
+            <span class="kpi-label">Supported Classes</span>
+            <h3 class="kpi-value">4 Categories</h3>
+            <span class="kpi-note">Tumor &amp; Healthy</span>
+        </div>
+    </div>
+</section>
+
+<!-- QUICK SAMPLES BAR -->
+<section class="samples-bar">
+    <div class="samples-label">
+        <i class="fa-solid fa-bolt-lightning"></i>
+        <span>One-Click Validation Samples:</span>
+    </div>
+    <div class="samples-buttons">
+        <a href="/sample/glioma" class="sample-chip chip-danger"><i class="fa-solid fa-virus"></i> Glioma</a>
+        <a href="/sample/meningioma" class="sample-chip chip-warning"><i class="fa-solid fa-circle-nodes"></i> Meningioma</a>
+        <a href="/sample/pituitary" class="sample-chip chip-info"><i class="fa-solid fa-microscope"></i> Pituitary</a>
+        <a href="/sample/notumor" class="sample-chip chip-success"><i class="fa-solid fa-circle-check"></i> Healthy (No Tumor)</a>
+    </div>
+</section>
+
+<!-- MAIN DASHBOARD CONTENT -->
+<section class="dashboard-grid">
+    <!-- QUICK UPLOAD CARD -->
+    <div class="card">
+        <div class="card-heading">
+            <h2>Quick MRI Inference &amp; Grad-CAM</h2>
+            <span class="step-badge">FAST SCAN</span>
+        </div>
+
+        <form action="/analysis" method="POST" enctype="multipart/form-data" id="uploadForm">
+            <label for="fileInput" class="upload-box" id="dropArea">
+                <div class="upload-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+                <h3>Drop your MRI scan here</h3>
+                <p>or <span class="browse-text">browse files</span> from your workstation</p>
+                <div class="file-info">Supports JPG, JPEG, PNG (Axial contrast-enhanced T1 recommended)</div>
+            </label>
+
+            <input type="file" name="file" id="fileInput" accept=".jpg,.jpeg,.png" required>
+
+            <div class="preview-wrapper" id="previewWrapper">
+                <div class="preview-top">
+                    <span><i class="fa-regular fa-image"></i> <span id="previewFileName">Selected Scan</span></span>
+                    <button type="button" class="remove-btn" id="removeBtn"><i class="fa-solid fa-xmark"></i> Remove</button>
+                </div>
+                <img id="previewImage" class="preview-image" alt="MRI Preview">
+                <div class="preview-meta">
+                    <span class="meta-chip" id="previewDimensions">Reading size...</span>
+                    <span class="meta-chip" id="previewSize">Reading bytes...</span>
+                </div>
+            </div>
+
+            <button type="submit" class="analyze-btn" id="analyzeBtn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Analyze Scan &amp; Generate Grad-CAM</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- RECENT ANALYSIS OR MODEL INFO -->
+    <div class="card">
+        {% if last_analysis %}
+        <div class="card-heading">
+            <h2>Latest Scan Analysis</h2>
+            <span class="result-badge"><i class="fa-solid fa-check"></i> ACTIVE SESSION</span>
+        </div>
+
+        <div class="recent-box">
+            <div class="recent-img-wrapper">
+                <img src="{{ last_analysis.file_path }}" alt="Recent Scan" class="recent-thumb">
+                {% if last_analysis.gradcam %}
+                <img src="{{ last_analysis.gradcam.overlay_url }}" alt="Grad-CAM Overlay" class="recent-thumb">
+                {% endif %}
+            </div>
+
+            <div class="recent-info">
+                <span class="result-label">Predicted Pathology</span>
+                <h3 class="prediction-title color-{{ last_analysis.prediction.color }}">{{ last_analysis.result }}</h3>
+                <div class="confidence-top">
+                    <span>Model Confidence</span>
+                    <span class="confidence-value">{{ last_analysis.confidence }}</span>
+                </div>
+            </div>
+
+            <div class="recent-actions">
+                <a href="/analysis" class="btn-primary-sm"><i class="fa-solid fa-chart-pie"></i> View Detailed Analysis</a>
+                <a href="/explainable-ai" class="btn-secondary-sm"><i class="fa-solid fa-fire"></i> View Grad-CAM XAI</a>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="card-heading">
+            <h2>Pathology Classifications</h2>
+            <span class="step-badge">4 CLASSES</span>
+        </div>
+
+        <div class="class-list">
+            <div class="class-item">
+                <div class="class-icon icon-glioma"><i class="fa-solid fa-brain"></i></div>
+                <div class="class-content">
+                    <h4>Glioma Tumor</h4>
+                    <p>Intra-axial glial origin with diffuse parenchymal infiltration.</p>
+                </div>
+            </div>
+
+            <div class="class-item">
+                <div class="class-icon icon-meningioma"><i class="fa-solid fa-circle-nodes"></i></div>
+                <div class="class-content">
+                    <h4>Meningioma Tumor</h4>
+                    <p>Extra-axial dural neoplasm causing focal neural compression.</p>
+                </div>
+            </div>
+
+            <div class="class-item">
+                <div class="class-icon icon-pituitary"><i class="fa-solid fa-microscope"></i></div>
+                <div class="class-content">
+                    <h4>Pituitary Adenoma</h4>
+                    <p>Sella turcica mass with endocrine and visual pathway impact.</p>
+                </div>
+            </div>
+
+            <div class="class-item">
+                <div class="class-icon icon-notumor"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="class-content">
+                    <h4>No Tumor (Healthy)</h4>
+                    <p>Symmetric physiological ventricles and intact brain parenchyma.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+

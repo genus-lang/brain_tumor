@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+
+{% block title %}AI Brain Tumor Care Assistant | NeuroScan AI{% endblock %}
+
+{% block content %}
+<!-- CARE ASSISTANT STYLESHEET -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/care_assistant.css') }}">
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="badge-hero">
+        <i class="fa-solid fa-hand-holding-medical"></i>
+        AI Health &amp; Patient Care Assistant
+    </div>
+    <h1>Brain Tumor Care, Treatment &amp; Precautions</h1>
+    <p>
+        Reliable, compassionate, and easy-to-understand health information for patients, caregivers, and families.
+        Explore medical treatment options, daily safety precautions, emergency warning signs, and rehabilitation guidance
+        sourced from the <strong>National Cancer Institute (NCI)</strong>, <strong>World Health Organization (WHO)</strong>, and <strong>American Cancer Society (ACS)</strong>.
+    </p>
+</section>
+
+<!-- CONTEXTUAL NOTIFICATION (IF ACCESSED POST-PREDICTION) -->
+{% if context_category %}
+<div class="context-banner mb-30">
+    <div class="context-banner-icon">
+        <i class="fa-solid fa-stethoscope"></i>
+    </div>
+    <div class="context-banner-content">
+        <h4>Educational Context: General Information Related to <span>{{ context_display }}</span></h4>
+        <p>
+            You are viewing guidance with optional context from your recent image scan. 
+            <strong>Important Medical Reminder:</strong> Machine learning predictions are experimental research outputs and 
+            <em>never</em> constitute a confirmed diagnosis. A "No Tumor" scan does not rule out neurological illness, 
+            and a tumor prediction does not indicate tumor grade, stage, or severity. Always consult a board-certified neurologist or neuro-oncologist.
+        </p>
+    </div>
+</div>
+{% endif %}
+
+<!-- EMERGENCY RED-FLAG BANNER -->
+<div class="emergency-strip mb-30">
+    <div class="emergency-strip-content">
+        <i class="fa-solid fa-truck-medical text-danger fs-3"></i>
+        <div>
+            <strong>Are You Experiencing an Immediate Medical Emergency?</strong>
+            <p>If you or someone around you has had a first seizure, a seizure lasting > 5 minutes, sudden paralysis, or loss of consciousness, 
+            <strong>call 911 / 112 / 999 or go to the nearest emergency room immediately.</strong> Do not wait for online or AI responses.</p>
+        </div>
+    </div>
+    <a href="#emergency-section" class="btn-emergency-strip">View Emergency Red Flags</a>
+</div>
+
+<!-- CARE NAVIGATION TABS -->
+<div class="care-nav-tabs mb-30" id="careTabs">
+    <button type="button" class="care-tab-btn active" data-tab="tab-chat">
+        <i class="fa-solid fa-comments"></i> Interactive AI Chatbot
+    </button>
+    <button type="button" class="care-tab-btn" data-tab="tab-treatments">
+        <i class="fa-solid fa-hospital"></i> Treatment Options
+    </button>
+    <button type="button" class="care-tab-btn" data-tab="tab-precautions">
+        <i class="fa-solid fa-shield-halved"></i> Precautions &amp; Patient Care
+    </button>
+    <button type="button" class="care-tab-btn" data-tab="tab-emergencies" id="emergency-section">
+        <i class="fa-solid fa-triangle-exclamation text-danger"></i> Emergency Signs
+    </button>
+    <button type="button" class="care-tab-btn" data-tab="tab-recovery">
+        <i class="fa-solid fa-person-walking"></i> Recovery &amp; Rehab
+    </button>
+    <button type="button" class="care-tab-btn" data-tab="tab-questions">
+        <i class="fa-solid fa-clipboard-question"></i> Questions for Doctor
+    </button>
+</div>
+
+<!-- TAB PANES CONTAINER -->
+<div class="care-tab-content mb-30">
+
+    <!-- =========================================================================
+         TAB 1: INTERACTIVE AI CHATBOT
+         ========================================================================= -->
+    <div class="tab-pane active" id="tab-chat">
+        <div class="chat-card">
+            <!-- CHAT HEADER -->
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="chat-bot-avatar">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <div>
+                        <h3>NeuroScan AI Health Assistant</h3>
+                        <span class="chat-status"><span class="chat-status-dot"></span> Sourced from NCI, WHO, ACS &amp; NHS</span>
+                    </div>
+                </div>
+                <div class="chat-header-badges">
+                    <span class="badge-edu">Educational Guidance Only</span>
+                </div>
+            </div>
+
+            <!-- SUGGESTED QUESTIONS CHIPS -->
+            <div class="chat-suggestions">
+                <span class="suggestions-label"><i class="fa-solid fa-lightbulb text-warning me-1"></i> Suggested Questions:</span>
+                <div class="suggestion-chips" id="suggestionChips">
+                    <button type="button" class="chip-btn" data-query="What precautions should a brain tumor patient take?">Precautions &amp; Safety</button>
+                    <button type="button" class="chip-btn" data-query="What treatments are available for brain tumors?">Treatment Modalities</button>
+                    <button type="button" class="chip-btn" data-query="Can a person recover after brain tumor surgery?">Surgical Recovery</button>
+                    <button type="button" class="chip-btn" data-query="What foods should a brain tumor patient eat?">Diet &amp; Nutrition</button>
+                    <button type="button" class="chip-btn" data-query="What are the emergency warning signs of complications?">Emergency Warning Signs</button>
+                    <button type="button" class="chip-btn" data-query="What questions should I ask my neurologist?">Questions for Doctor</button>
+                    <button type="button" class="chip-btn" data-query="What is the difference between benign and malignant brain tumors?">Benign vs. Malignant</button>
+                </div>
+            </div>
+
+            <!-- CHAT MESSAGE FEED -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Bot Message -->
+                <div class="chat-msg bot-msg">
+                    <div class="msg-avatar"><i class="fa-solid fa-user-doctor"></i></div>
+                    <div class="msg-bubble">
+                        <div class="msg-text">
+                            <p><strong>Hello and welcome.</strong> I am your AI Brain Tumor Care Assistant. I am here to provide clear, reliable, and supportive information regarding brain tumors, medical treatments, daily safety precautions, recovery, and what to ask your healthcare team.</p>
+                            <p>You can ask any question in plain language below or click any of the suggested topics above to get started.</p>
+                            <div class="msg-disclaimer">
+                                <i class="fa-solid fa-circle-info me-1"></i> <em>I provide educational health information and cannot diagnose illnesses, prescribe medicines, or replace your physician.</em>
+                            </div>
+                        </div>
+                        <span class="msg-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAT INPUT BAR -->
+            <form class="chat-input-bar" id="chatForm">
+                <input type="text" id="chatInput" placeholder="Type your health or care question here (e.g., What precautions should I take?)..." autocomplete="off" required>
+                <input type="hidden" id="chatContext" value="{{ context_category or '' }}">
+                <button type="submit" id="chatSendBtn" class="chat-send-btn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Ask AI</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 2: TREATMENT & MEDICAL OPTIONS
+         ========================================================================= -->
+    <div class="tab-pane" id="tab-treatments">
+        <div class="card">
+            <div class="card-heading">
+                <h2>Treatment &amp; Available Medical Options</h2>
+                <span class="step-badge">CLINICAL MODALITIES</span>
+            </div>
+            <p class="sub-muted mb-20">
+                Brain tumor management is highly individualized and determined by a multidisciplinary neuro-oncology board. 
+                Treatment depends on tumor type, WHO grade, anatomical accessibility, molecular biomarkers (such as IDH mutations and MGMT methylation), and overall patient health.
+            </p>
+
+            <div class="treatment-grid">
+                {% for t in care_data.treatments %}
+                <div class="treatment-card">
+                    <div class="treatment-card-header">
+                        <h4>{{ t.name }}</h4>
+                    </div>
+                    <div class="treatment-card-body">
+                        <p class="treatment-desc"><strong>What it means:</strong> {{ t.description }}</p>
+                        <p class="treatment-desc"><strong>Why recommended:</strong> {{ t.why_recommended }}</p>
+                        {% if t.technologies %}<p class="treatment-desc"><strong>Key Techniques:</strong> {{ t.technologies }}</p>{% endif %}
+                        {% if t.standard_agents %}<p class="treatment-desc"><strong>Standard Agents:</strong> {{ t.standard_agents }}</p>{% endif %}
+                        <div class="treatment-side-effects">
+                            <span class="side-effects-title"><i class="fa-solid fa-triangle-exclamation text-amber me-1"></i> Potential Side Effects:</span>
+                            <p>{{ t.side_effects }}</p>
+                        </div>
+                        <div class="treatment-question-box">
+                            <span class="question-box-title"><i class="fa-regular fa-comment-dots text-primary me-1"></i> Ask Your Doctor:</span>
+                            <p><em>"{{ t.questions_to_ask }}"</em></p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 3: PRECAUTIONS & PATIENT CARE
+         ========================================================================= -->
+    <div class="tab-pane" id="tab-precautions">
+        <div class="card">
+            <div class="card-heading">
+                <h2>Precautions &amp; Patient Care Guidelines</h2>
+                <span class="step-badge">DAILY SAFETY</span>
+            </div>
+            <p class="sub-muted mb-20">
+                Following sound, evidence-based daily precautions minimizes injury risks, supports neuro-cognitive recovery, and maintains optimal quality of life.
+            </p>
+
+            <div class="precautions-grid">
+                {% for g in care_data.precautions %}
+                <div class="precaution-card">
+                    <div class="precaution-icon"><i class="fa-solid {{ g.icon }}"></i></div>
+                    <div class="precaution-content">
+                        <h4>{{ g.category }}</h4>
+                        <p>{{ g.text }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="disclaimer-card mt-20">
+                <i class="fa-solid fa-ban text-danger fs-4"></i>
+                <p>
+                    <strong>Crucial Medical Fact on Alternative Remedies:</strong>
+                    No food, special diet (such as extreme alkaline or unmonitored keto), herbal infusion, or home remedy has ever been scientifically proven to cure a brain tumor. 
+                    Always consult your oncology team before taking any over-the-counter supplements, as many interfere with radiation efficacy or anti-epileptic drug metabolism.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 4: EMERGENCY WARNING SIGNS
+         ========================================================================= -->
+    <div class="tab-pane" id="tab-emergencies">
+        <div class="card">
+            <div class="card-heading">
+                <h2>When Should You Seek Medical Help?</h2>
+                <span class="step-badge bg-danger text-white">TRIAGE GUIDE</span>
+            </div>
+            <p class="sub-muted mb-20">
+                It is vital for patients, family members, and caregivers to clearly understand the difference between routine symptoms requiring prompt clinic evaluation and acute red-flag emergencies.
+            </p>
+
+            <div class="grid-2-equal">
+                <!-- IMMEDIATE EMERGENCY BOX -->
+                <div class="emergency-box red-emergency-box">
+                    <div class="emergency-box-header">
+                        <i class="fa-solid fa-circle-exclamation text-danger fs-3"></i>
+                        <div>
+                            <h3>Immediate Emergency Signs</h3>
+                            <span>Call 911 / 112 / 999 or Go to Emergency Room Immediately</span>
+                        </div>
+                    </div>
+                    <ul class="emergency-list">
+                        {% for item in care_data.emergencies.immediate_emergency %}
+                        <li>{{ item | replace('**', '<strong>') | replace('**', '</strong>') | safe }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="emergency-alert-tag">
+                        <i class="fa-solid fa-bell me-1"></i> Do not drive yourself. Have an ambulance or companion transport you.
+                    </div>
+                </div>
+
+                <!-- PROMPT EVALUATION BOX -->
+                <div class="emergency-box amber-evaluation-box">
+                    <div class="emergency-box-header">
+                        <i class="fa-solid fa-clock text-amber fs-3"></i>
+                        <div>
+                            <h3>Prompt Medical Evaluation</h3>
+                            <span>Contact Neurologist / Oncologist Within 24–48 Hours</span>
+                        </div>
+                    </div>
+                    <ul class="emergency-list">
+                        {% for item in care_data.emergencies.prompt_evaluation %}
+                        <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                    <div class="evaluation-alert-tag">
+                        <i class="fa-solid fa-calendar-check me-1"></i> Document exact timing, duration, and triggers of new symptoms.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 5: RECOVERY & REHABILITATION
+         ========================================================================= -->
+    <div class="tab-pane" id="tab-recovery">
+        <div class="card">
+            <div class="card-heading">
+                <h2>Recovery, Rehabilitation &amp; Quality of Life</h2>
+                <span class="step-badge">NEURO-REHAB</span>
+            </div>
+            <p class="sub-muted mb-20">
+                Recovery from brain tumor surgery, radiation, or chemotherapy is a gradual journey. 
+                Because the brain possesses remarkable **neuroplasticity**, structured multi-disciplinary therapies help rebuild strength, speech, memory, and independence.
+            </p>
+
+            <div class="timeline-container">
+                {% for phase in care_data.recovery %}
+                <div class="timeline-card">
+                    <div class="timeline-marker">{{ loop.index }}</div>
+                    <div class="timeline-body">
+                        <h4>{{ phase.title }}</h4>
+                        <p>{{ phase.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         TAB 6: QUESTIONS FOR DOCTOR
+         ========================================================================= -->
+    <div class="tab-pane" id="tab-questions">
+        <div class="card">
+            <div class="card-heading">
+                <h2>Essential Questions to Ask Your Medical Team</h2>
+                <span class="step-badge">PATIENT ADVOCACY</span>
+            </div>
+            <p class="sub-muted mb-20">
+                Medical appointments can be overwhelming. Bring a notebook, an advocate or family member, and this checklist to your consultation:
+            </p>
+
+            <div class="questions-checklist">
+                {% for q in care_data.questions %}
+                <div class="question-check-item">
+                    <div class="q-num">{{ loop.index }}</div>
+                    <div class="q-text">
+                        <strong>{{ q }}</strong>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="alert-card alert-warning mt-20">
+                <i class="fa-solid fa-microphone me-2"></i>
+                <p class="mb-0"><strong>Helpful Tip:</strong> Ask your doctor: <em>"May I audio-record this consultation on my phone so I can review your instructions calmly with my family later?"</em> Most clinicians welcome this.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- AUTHORITATIVE MEDICAL REFERENCES LIBRARY -->
+<section class="card mb-30">
+    <div class="card-heading">
+        <h2>Authoritative Medical Sources &amp; Resources</h2>
+        <span class="step-badge">VERIFIED REFERENCES</span>
+    </div>
+    <p class="sub-muted mb-16">All health facts in this assistant are synthesized from established clinical oncology consensus:</p>
+    
+    <div class="sources-grid">
+        {% for src in care_data.sources %}
+        <a href="{{ src.url }}" target="_blank" rel="noopener noreferrer" class="source-card">
+            <div class="source-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="source-text">
+                <h4>{{ src.name }}</h4>
+                <p>{{ src.organization }}</p>
+            </div>
+            <div class="source-arrow"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- SCRIPTS -->
+<script src="{{ url_for('static', filename='js/care_assistant.js') }}"></script>
+{% endblock %}
+

@@ -145,3 +145,4 @@ def generate_gradcam(image_path, target_class_idx=None):
         'target_layer': 'block5_conv3',
         'target_class_idx': target_class_idx
     }
+

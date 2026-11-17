@@ -16,6 +16,8 @@ dataset/
 # Uploaded test files & artifacts
 uploads/*
 !uploads/.gitkeep
+static/results/*
+!static/results/.gitkeep
 
 # Large Model weights (>100MB exceeds GitHub limits)
 models/*.h5

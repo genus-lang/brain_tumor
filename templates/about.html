@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}About Project & Architecture | NeuroScan AI{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="badge-hero">
+        <i class="fa-solid fa-graduation-cap"></i>
+        Academic &amp; Research Initiative
+    </div>
+    <h1>About NeuroScan AI &bull; Deep Learning Architecture</h1>
+    <p>
+        NeuroScan AI investigates the application of convolutional neural networks (CNNs) and explainability techniques
+        in computer-aided neurological imaging, bridging the gap between deep feature extraction and interpretable clinical saliency.
+    </p>
+</section>
+
+<!-- ARCHITECTURE BREAKDOWN -->
+<div class="card mb-30">
+    <div class="card-heading">
+        <h2>VGG16 Transfer Learning Pipeline</h2>
+        <span class="step-badge">16-LAYER CNN</span>
+    </div>
+
+    <div class="grid-2-equal">
+        <div>
+            <h3 class="info-title">Model Formulation</h3>
+            <p class="text-muted leading-relaxed mb-16">
+                The core classification engine utilizes the <strong>VGG16</strong> architecture pre-trained on ImageNet.
+                To adapt general visual features to complex neurological MRI textures, a staged transfer learning approach was employed:
+            </p>
+            <ul class="clinical-check-list">
+                <li><strong>Feature Extraction Backbone (Blocks 1–4):</strong> Frozen convolutional layers capturing foundational edge, gradient, and texture representations.</li>
+                <li><strong>Domain Adaptation (Block 5):</strong> Fine-tuned with a low learning rate (\(1 \times 10^{-4}\)) on MRI brain parenchyma to learn tumor boundaries and tissue densities.</li>
+                <li><strong>Classification Head:</strong> Custom top layers incorporating Global Flattening, Batch Normalization, Dropout (0.3 and 0.2), Dense (256 units), and a 4-way Softmax activation.</li>
+            </ul>
+        </div>
+
+        <div class="arch-box">
+            <h4><i class="fa-solid fa-layer-group text-primary"></i> Layer Specification</h4>
+            <div class="meta-table mt-12">
+                <div class="meta-row">
+                    <span class="meta-key">Input Dimension</span>
+                    <span class="meta-val">\(128 \times 128 \times 3\) RGB Normalized</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Total Parameters</span>
+                    <span class="meta-val">16,846,918 (\(\sim 64.3\) MB)</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Trainable Parameters</span>
+                    <span class="meta-val">9,194,756 (\(\sim 35.1\) MB)</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Final Conv Layer</span>
+                    <span class="meta-val"><code>block5_conv3</code> (\(8 \times 8 \times 512\))</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-key">Optimizer &amp; Loss</span>
+                    <span class="meta-val">Adam &bull; Sparse Categorical Cross-Entropy</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DATASET CATEGORIES -->
+<div class="card mb-30">
+    <div class="card-heading">
+        <h2>Dataset Diagnostic Pathology Classes</h2>
+        <span class="step-badge">7,200 SCANS</span>
+    </div>
+
+    <div class="grid-4-col">
+        <div class="class-card-detailed">
+            <div class="class-icon icon-glioma"><i class="fa-solid fa-brain"></i></div>
+            <h4>Glioma</h4>
+            <p>Intra-axial glial support cell neoplasms with diffuse infiltration into brain parenchyma. Common grades: astrocytoma, oligodendroglioma, glioblastoma multiforme.</p>
+        </div>
+
+        <div class="class-card-detailed">
+            <div class="class-icon icon-meningioma"><i class="fa-solid fa-circle-nodes"></i></div>
+            <h4>Meningioma</h4>
+            <p>Arachnoid cap cell origin from the meninges. Predominantly slow-growing, extra-axial lesions causing focal compression on adjacent cortex and cranial nerves.</p>
+        </div>
+
+        <div class="class-card-detailed">
+            <div class="class-icon icon-pituitary"><i class="fa-solid fa-microscope"></i></div>
+            <h4>Pituitary Adenoma</h4>
+            <p>Sella turcica lesions originating in the anterior pituitary gland, frequently presenting with hyperprolactinemia, Cushingoid changes, or optic chiasm compression.</p>
+        </div>
+
+        <div class="class-card-detailed">
+            <div class="class-icon icon-notumor"><i class="fa-solid fa-circle-check"></i></div>
+            <h4>No Tumor (Normal)</h4>
+            <p>Physiological anatomical contours displaying symmetric lateral and third ventricles, intact midline alignment, and absence of mass effect or peritumoral vasogenic edema.</p>
+        </div>
+    </div>
+</div>
+
+<!-- TECHNICAL STACK & CREDITS -->
+<div class="card mb-30">
+    <div class="card-heading">
+        <h2>Technology Stack &amp; Libraries</h2>
+        <span class="step-badge">SPECIFICATIONS</span>
+    </div>
+
+    <div class="grid-3-col">
+        <div class="tech-item">
+            <i class="fa-brands fa-python text-primary"></i>
+            <h4>Python 3.12 &amp; Flask</h4>
+            <p>Lightweight asynchronous microframework providing REST API endpoints and template rendering.</p>
+        </div>
+
+        <div class="tech-item">
+            <i class="fa-solid fa-cube text-primary"></i>
+            <h4>TensorFlow &amp; Keras</h4>
+            <p>Deep learning framework powering VGG16 tensor computation, transfer learning, and gradient backpropagation.</p>
+        </div>
+
+        <div class="tech-item">
+            <i class="fa-solid fa-chart-pie text-primary"></i>
+            <h4>Chart.js &amp; Matplotlib</h4>
+            <p>Interactive vector charts, differential probability graphs, and clinical JET colormapping for Grad-CAM overlays.</p>
+        </div>
+    </div>
+</div>
+
+<!-- PROJECT LIMITATIONS -->
+<div class="disclaimer-card">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <div>
+        <h4 class="mb-1 text-amber">Academic Scope &amp; Technical Limitations</h4>
+        <p>
+            This system evaluates single 2D axial MRI slices and does not incorporate multi-parametric 3D volumetric DICOM acquisitions,
+            perfusion-weighted imaging (PWI), or MR spectroscopy. It is designed solely for computational imaging research and educational demonstrations.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
