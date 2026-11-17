@@ -10,31 +10,31 @@ app = Flask(__name__)
 CLASS_LABELS = ['pituitary', 'glioma', 'notumor', 'meningioma']
 
 CLASS_DISPLAY = {
-    'pituitary': 'Pituitary Tumor',
-    'glioma': 'Glioma Tumor',
-    'notumor': 'Healthy (No Tumor)',
-    'meningioma': 'Meningioma Tumor'
+    'pituitary': 'Pituitary',
+    'glioma': 'Glioma',
+    'notumor': 'No Tumor',
+    'meningioma': 'Meningioma'
 }
 
 CLASS_DESCRIPTIONS = {
     'glioma': (
-        "Gliomas originate in the brain's glial support cells. They are intra-axial tumors "
+        "Gliomas originate in the brain's glial support cells. They are intra-axial neoplasms "
         "often characterized by diffuse infiltration into surrounding brain parenchyma. "
-        "Symptoms can include persistent headaches, focal neurological deficits, and seizures."
+        "Clinical manifestations frequently include progressive headaches and focal neurological signs."
     ),
     'meningioma': (
-        "Meningiomas arise from the arachnoid cells of the meninges covering the brain. "
-        "The vast majority are slow-growing and benign, causing clinical effects primarily "
-        "via compression of adjacent brain tissue and cranial nerves."
+        "Meningiomas arise from arachnoid cap cells of the meninges covering the brain. "
+        "The vast majority are slow-growing extra-axial tumors that primarily produce symptoms "
+        "via mechanical compression of adjacent brain tissue and cranial nerves."
     ),
     'pituitary': (
-        "Pituitary adenomas develop in the pituitary gland at the skull base (sella turcica). "
-        "They commonly present with endocrine hormone dysregulation or bitemporal hemianopsia "
-        "(vision loss) due to optic chiasm compression."
+        "Pituitary adenomas develop in the sella turcica at the skull base. "
+        "They commonly present with neuroendocrine hormone alterations or bitemporal hemianopsia "
+        "due to superior compression of the optic chiasm."
     ),
     'notumor': (
-        "Normal brain MRI scan. Brain parenchyma, ventricular system, and midline structures "
-        "demonstrate physiological anatomical contours without signs of space-occupying lesions or edema."
+        "Normal physiological brain MRI scan. Brain parenchyma, ventricular contours, "
+        "and midline structures demonstrate normal anatomical integrity without evidence of space-occupying lesions."
     )
 }
 
@@ -104,8 +104,8 @@ def predict_tumor(image_path):
         probabilities.append({
             'key': label,
             'name': CLASS_DISPLAY[label],
-            'percentage': f"{pct:.1f}",
-            'value': pct,
+            'percentage': f"{pct:.2f}%",
+            'value': round(pct, 2),
             'color': CLASS_COLORS[label],
             'is_top': (idx == pred_idx)
         })
@@ -113,12 +113,13 @@ def predict_tumor(image_path):
     # Sort probabilities descending for clean chart display
     probabilities = sorted(probabilities, key=lambda x: x['value'], reverse=True)
 
-    result_title = "No Tumor Detected" if top_label == 'notumor' else f"Tumor Detected: {CLASS_DISPLAY[top_label]}"
+    result_class = CLASS_DISPLAY[top_label]
+    confidence_formatted = f"{confidence * 100:.2f}%"
 
     return {
         'top_key': top_label,
-        'result': result_title,
-        'confidence': f"{confidence * 100:.1f}",
+        'result': result_class,
+        'confidence': confidence_formatted,
         'confidence_val': confidence * 100,
         'color': CLASS_COLORS[top_label],
         'description': CLASS_DESCRIPTIONS[top_label],
@@ -137,8 +138,11 @@ def index():
                 prediction_data = predict_tumor(file_location)
                 return render_template(
                     'index.html',
+                    result=prediction_data['result'],
+                    confidence=prediction_data['confidence'],
+                    file_path=f"/uploads/{file.filename}",
                     prediction=prediction_data,
-                    file_path=f"/uploads/{file.filename}"
+                    probabilities=prediction_data['probabilities']
                 )
             except FileNotFoundError as fnf_err:
                 return render_template(
@@ -157,7 +161,15 @@ def index():
     if not os.path.exists(MODEL_PATH):
         warning = "Model file 'models/model.h5' not found. Training may still be in progress."
 
-    return render_template('index.html', prediction=None, warning=warning)
+    return render_template(
+        'index.html',
+        result=None,
+        confidence=None,
+        file_path=None,
+        prediction=None,
+        probabilities=None,
+        warning=warning
+    )
 
 @app.route('/sample/<tumor_type>')
 def test_sample(tumor_type):
@@ -171,8 +183,11 @@ def test_sample(tumor_type):
                 prediction_data = predict_tumor(dest)
                 return render_template(
                     'index.html',
+                    result=prediction_data['result'],
+                    confidence=prediction_data['confidence'],
+                    file_path=f"/uploads/sample_{src}",
                     prediction=prediction_data,
-                    file_path=f"/uploads/sample_{src}"
+                    probabilities=prediction_data['probabilities']
                 )
             except Exception as e:
                 return render_template('index.html', error=str(e))
@@ -183,5 +198,5 @@ def get_uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
-    print("[INFO] Starting Brain Tumor Detection Web Server at http://127.0.0.1:5000")
+    print("[INFO] Starting NeuroScan AI Web Server at http://127.0.0.1:5000")
     app.run(debug=True, port=5000)

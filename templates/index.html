@@ -1,202 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Brain Tumor Detection & MRI Diagnostics</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: #f0f4f8;
-            color: #2d3748;
-        }
-        .main-container {
-            max-width: 950px;
-            margin: 30px auto;
-        }
-        .header-card {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            color: white;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 10px 25px rgba(30, 58, 138, 0.15);
-        }
-        .upload-card {
-            border-radius: 16px;
-            border: 2px dashed #cbd5e1;
-            background: #ffffff;
-            transition: all 0.3s ease;
-        }
-        .upload-card:hover {
-            border-color: #3b82f6;
-            background: #f8fafc;
-        }
-        .result-card {
-            border-radius: 16px;
-            background: #ffffff;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-        .mri-preview {
-            max-height: 380px;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            object-fit: contain;
-            background: #000;
-        }
-        .prob-bar {
-            height: 12px;
-            border-radius: 6px;
-        }
-        .badge-confidence {
-            font-size: 1.1rem;
-            padding: 8px 16px;
-            border-radius: 30px;
-        }
-        .btn-sample {
-            border-radius: 20px;
-            font-size: 0.85rem;
-            padding: 6px 14px;
-            font-weight: 500;
-        }
-    </style>
+
+    <title>NeuroScan AI | Advanced Brain MRI Analysis</title>
+
+    <!-- Google Fonts: Manrope (Headings) & DM Sans (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.5.1 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
-<div class="container main-container">
-    <!-- Header -->
-    <div class="header-card text-center mb-4">
-        <h1 class="display-6 fw-bold mb-2"><i class="bi bi-activity me-2"></i>MRI Brain Tumor Detection System</h1>
-        <p class="lead mb-0 text-white-50">Deep Learning Diagnostic Assistant powered by Transfer Learning (VGG16)</p>
-    </div>
 
-    <!-- Warnings / Errors -->
-    {% if warning %}
-    <div class="alert alert-warning shadow-sm border-0 d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
-        <div>
-            <div class="fw-bold">Model Notification</div>
-            <div>{{ warning }}</div>
-        </div>
-    </div>
-    {% endif %}
-
-    {% if error %}
-    <div class="alert alert-danger shadow-sm border-0 d-flex align-items-center mb-4" role="alert">
-        <i class="bi bi-x-circle-fill fs-4 me-3"></i>
-        <div>
-            <div class="fw-bold">Error</div>
-            <div>{{ error }}</div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Quick Samples Testing Toolbar -->
-    <div class="card shadow-sm border-0 mb-4 p-3 bg-white">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <span class="text-muted small fw-semibold"><i class="bi bi-lightning-charge-fill text-warning me-1"></i>Quick Test Samples:</span>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="/sample/glioma" class="btn btn-outline-danger btn-sample"><i class="bi bi-virus me-1"></i>Glioma</a>
-                <a href="/sample/meningioma" class="btn btn-outline-warning btn-sample text-dark"><i class="bi bi-shield-exclamation me-1"></i>Meningioma</a>
-                <a href="/sample/notumor" class="btn btn-outline-success btn-sample"><i class="bi bi-check-circle me-1"></i>Healthy (No Tumor)</a>
-                <a href="/sample/pituitary" class="btn btn-outline-info btn-sample"><i class="bi bi-record-circle me-1"></i>Pituitary</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upload Form -->
-    <div class="upload-card shadow-sm p-4 text-center mb-4">
-        <form method="POST" enctype="multipart/form-data" id="uploadForm">
-            <i class="bi bi-cloud-arrow-up display-4 text-primary mb-2"></i>
-            <h5 class="fw-bold mb-1">Select or Drag an MRI Image</h5>
-            <p class="text-muted small mb-3">Supported formats: JPG, JPEG, PNG (T1, T2, FLAIR contrast axial scans)</p>
-            
-            <div class="col-md-6 mx-auto mb-3">
-                <input type="file" class="form-control" id="file" name="file" accept="image/*" required onchange="showFileName(this)">
-            </div>
-            <button type="submit" class="btn btn-primary px-4 py-2 fw-semibold" id="submitBtn">
-                <i class="bi bi-search me-1"></i>Analyze MRI Scan
-            </button>
-        </form>
-    </div>
-
-    <!-- Prediction Results Display -->
-    {% if prediction %}
-    <div class="result-card p-4 mb-4">
-        <div class="d-flex justify-content-between align-items-center border-bottom pb-3 mb-4 flex-wrap gap-2">
-            <div>
-                <span class="text-uppercase text-muted small fw-bold">Diagnostic Classification</span>
-                <h3 class="fw-bold text-{{ prediction.color }} mb-0">
-                    {% if prediction.top_key == 'notumor' %}
-                        <i class="bi bi-check-circle-fill me-2"></i>{{ prediction.result }}
-                    {% else %}
-                        <i class="bi bi-exclamation-octagon-fill me-2"></i>{{ prediction.result }}
-                    {% endif %}
-                </h3>
-            </div>
-            <div>
-                <span class="badge bg-{{ prediction.color }} badge-confidence shadow-sm">
-                    Confidence: {{ prediction.confidence }}%
-                </span>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <!-- Left Column: MRI Image Preview -->
-            <div class="col-md-5 text-center">
-                <div class="p-2 bg-dark rounded">
-                    <img src="{{ file_path }}" class="img-fluid mri-preview w-100" alt="Analyzed MRI Image">
+    <!-- NAVIGATION BAR -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
                 </div>
-                <small class="text-muted d-block mt-2">Analyzed MRI Slice ($128 \times 128$ Input Tensor)</small>
+                <div class="brand-text">
+                    <span class="brand-name">NeuroScan<span> AI</span></span>
+                    <span class="brand-tag">Clinical Imaging Intelligence</span>
+                </div>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="#upload-section" class="nav-link">MRI Analysis</a></li>
+                <li><a href="#model-info" class="nav-link">About Model</a></li>
+                <li><a href="#samples-section" class="nav-link">Quick Samples</a></li>
+            </ul>
+
+            <div class="nav-right">
+                <div class="status-indicator">
+                    <div class="pulse-dot"></div>
+                    <span>System Ready &bull; VGG16</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="container">
+
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="badge-hero">
+                <i class="fa-solid fa-microchip"></i>
+                Powered by VGG16 Deep Learning
             </div>
 
-            <!-- Right Column: Probabilities & Clinical Insight -->
-            <div class="col-md-7">
-                <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Differential Probability Breakdown</h5>
-                
-                <div class="mb-4">
-                    {% for prob in prediction.probabilities %}
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between small mb-1">
-                            <span class="fw-semibold {% if prob.is_top %}text-{{ prob.color }} fw-bold{% endif %}">
-                                {{ prob.name }} {% if prob.is_top %}★{% endif %}
-                            </span>
-                            <span class="fw-bold">{{ prob.percentage }}%</span>
+            <h1>Advanced Brain MRI Analysis</h1>
+
+            <p>
+                Explore AI-powered MRI image classification using deep learning technology.
+                The system analyzes axial brain MRI scans and evaluates features across four supported
+                diagnostic categories with automated differential probabilities.
+            </p>
+        </section>
+
+        <!-- WARNINGS & NOTIFICATIONS -->
+        {% if warning %}
+        <div class="alert-card alert-warning">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+                <strong>System Notice:</strong> {{ warning }}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="alert-card alert-danger">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+                <strong>Analysis Error:</strong> {{ error }}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- QUICK TEST SAMPLES TOOLBAR -->
+        <section class="samples-bar" id="samples-section">
+            <div class="samples-label">
+                <i class="fa-solid fa-bolt-lightning"></i>
+                <span>One-Click Test Samples:</span>
+            </div>
+            <div class="samples-buttons">
+                <a href="/sample/glioma" class="sample-chip chip-danger">
+                    <i class="fa-solid fa-virus"></i>
+                    Glioma Sample
+                </a>
+                <a href="/sample/meningioma" class="sample-chip chip-warning">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    Meningioma Sample
+                </a>
+                <a href="/sample/pituitary" class="sample-chip chip-info">
+                    <i class="fa-solid fa-microscope"></i>
+                    Pituitary Sample
+                </a>
+                <a href="/sample/notumor" class="sample-chip chip-success">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Healthy (No Tumor)
+                </a>
+            </div>
+        </section>
+
+        <!-- DASHBOARD GRID -->
+        <section class="dashboard-grid">
+
+            <!-- UPLOAD CARD -->
+            <div class="card" id="upload-section">
+                <div class="card-heading">
+                    <h2>Upload MRI Scan</h2>
+                    <span class="step-badge">STEP 01</span>
+                </div>
+
+                <form action="/" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <label for="fileInput" class="upload-box" id="dropArea">
+                        <div class="upload-icon">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
                         </div>
-                        <div class="progress prob-bar">
-                            <div class="progress-bar bg-{{ prob.color }}" role="progressbar" 
-                                 style="width: {{ prob.value }}%;" 
-                                 aria-valuenow="{{ prob.value }}" aria-valuemin="0" aria-valuemax="100">
+                        <h3>Drop your MRI scan here</h3>
+                        <p>
+                            or <span class="browse-text">browse files</span> from your computer
+                        </p>
+                        <div class="file-info">
+                            Supported: JPG, JPEG, PNG (Axial T1-CE scans recommended)
+                        </div>
+                    </label>
+
+                    <input type="file"
+                           name="file"
+                           id="fileInput"
+                           accept=".jpg,.jpeg,.png"
+                           required>
+
+                    <!-- PREVIEW WRAPPER -->
+                    <div class="preview-wrapper" id="previewWrapper">
+                        <div class="preview-top">
+                            <span>
+                                <i class="fa-regular fa-image"></i>
+                                <span id="previewFileName">Selected Scan</span>
+                            </span>
+                            <button type="button" class="remove-btn" id="removeBtn">
+                                <i class="fa-solid fa-xmark"></i>
+                                Remove
+                            </button>
+                        </div>
+
+                        <img id="previewImage" class="preview-image" alt="MRI Scan Preview">
+
+                        <div class="preview-meta">
+                            <span class="meta-chip" id="previewDimensions">Reading size...</span>
+                            <span class="meta-chip" id="previewSize">Reading bytes...</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="analyze-btn" id="analyzeBtn">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Analyze MRI Image</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- MODEL INFORMATION CARD -->
+            <div class="card" id="model-info">
+                <div class="card-heading">
+                    <h2>Model Architecture</h2>
+                    <span class="step-badge">VGG16 Backbone</span>
+                </div>
+
+                <h3 class="info-title">Supported Classification Categories</h3>
+                <p class="info-description">
+                    The deep neural network evaluates features against the four pathological classes defined in the clinical training dataset.
+                </p>
+
+                <div class="class-list">
+                    <div class="class-item">
+                        <div class="class-icon icon-glioma">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div class="class-content">
+                            <h4>Glioma</h4>
+                            <p>Intra-axial glial cell tumor exhibiting diffuse infiltration into surrounding brain parenchyma.</p>
+                        </div>
+                    </div>
+
+                    <div class="class-item">
+                        <div class="class-icon icon-meningioma">
+                            <i class="fa-solid fa-circle-nodes"></i>
+                        </div>
+                        <div class="class-content">
+                            <h4>Meningioma</h4>
+                            <p>Extra-axial neoplasm originating from arachnoid cells, exerting mass effect on adjacent neural structures.</p>
+                        </div>
+                    </div>
+
+                    <div class="class-item">
+                        <div class="class-icon icon-pituitary">
+                            <i class="fa-solid fa-microscope"></i>
+                        </div>
+                        <div class="class-content">
+                            <h4>Pituitary Tumor</h4>
+                            <p>Sella turcica adenoma frequently associated with endocrine alterations or optic chiasm displacement.</p>
+                        </div>
+                    </div>
+
+                    <div class="class-item">
+                        <div class="class-icon icon-notumor">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div class="class-content">
+                            <h4>No Tumor</h4>
+                            <p>Physiological anatomical contours without radiological evidence of space-occupying lesions or edema.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- PREDICTION RESULTS SECTION -->
+        {% if result %}
+        <section class="result-section" id="results">
+            <div class="result-card">
+                <div class="result-header">
+                    <h2>Diagnostic Analysis Output</h2>
+                    <span class="result-badge">
+                        <i class="fa-solid fa-circle-check"></i>
+                        Inference Generated
+                    </span>
+                </div>
+
+                <div class="result-grid">
+                    <!-- Left: Lightbox MRI Viewer -->
+                    <div>
+                        <div class="result-image-box">
+                            <img src="{{ file_path }}" alt="Analyzed MRI Scan" class="result-image">
+                            <div class="image-caption">
+                                <i class="fa-solid fa-expand me-1"></i> Input Scan ($128 \times 128$ Normalized Tensor)
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
 
-                <!-- Medical Insight Box -->
-                <div class="alert alert-light border p-3 rounded-3">
-                    <h6 class="fw-bold text-dark mb-1"><i class="bi bi-info-circle-fill text-primary me-2"></i>Clinical Overview</h6>
-                    <p class="small text-muted mb-0 leading-relaxed">{{ prediction.description }}</p>
+                    <!-- Right: Diagnostic Details -->
+                    <div class="result-details">
+                        <p class="result-label">Predicted Classification</p>
+                        
+                        <h3 class="prediction-title {% if prediction %}color-{{ prediction.color }}{% endif %}">
+                            {{ result }}
+                        </h3>
+
+                        <!-- Primary Confidence Bar -->
+                        <div class="confidence-container">
+                            <div class="confidence-top">
+                                <span>Model Confidence Score</span>
+                                <span class="confidence-value">{{ confidence }}</span>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" id="confidenceBar" data-confidence="{{ confidence }}"></div>
+                            </div>
+                        </div>
+
+                        <!-- Differential Probabilities Breakdown (if available) -->
+                        {% if probabilities %}
+                        <div class="differential-section">
+                            <div class="differential-title">
+                                <i class="fa-solid fa-chart-column"></i>
+                                Differential Probability Breakdown
+                            </div>
+                            <div class="differential-list">
+                                {% for prob in probabilities %}
+                                <div class="diff-item">
+                                    <div class="diff-top">
+                                        <span>
+                                            {{ prob.name }}
+                                            {% if prob.is_top %}<strong>(Primary)</strong>{% endif %}
+                                        </span>
+                                        <span>{{ prob.percentage }}</span>
+                                    </div>
+                                    <div class="diff-bar">
+                                        <div class="diff-fill bar-{{ prob.color }}" data-value="{{ prob.value }}"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Clinical Overview Insight -->
+                        {% if prediction and prediction.description %}
+                        <div class="clinical-overview-box">
+                            <h5><i class="fa-solid fa-circle-info"></i> Clinical Overview</h5>
+                            <p>{{ prediction.description }}</p>
+                        </div>
+                        {% endif %}
+
+                        <p class="result-note">
+                            This percentage represents the neural network's softmax activation score.
+                            It reflects statistical feature alignment within the training domain and should not be interpreted as absolute diagnostic certainty.
+                        </p>
+
+                        <a href="/" class="reset-btn">
+                            <i class="fa-solid fa-arrow-rotate-left"></i>
+                            Analyze Another Scan
+                        </a>
+                    </div>
                 </div>
             </div>
+        </section>
+        {% endif %}
+
+        <!-- MEDICAL DISCLAIMER -->
+        <div class="disclaimer-card">
+            <i class="fa-solid fa-shield-halved"></i>
+            <p>
+                <strong>Important Medical Disclaimer:</strong>
+                This project is developed for educational and research purposes only. Its predictions are generated by an artificial intelligence model and are not clinical medical diagnoses. It must never be used to guide treatment, medication, or clinical decisions. Always consult a board-certified radiologist or qualified physician for medical imaging evaluation.
+            </p>
         </div>
-    </div>
-    {% endif %}
 
-    <!-- Footer -->
-    <div class="text-center text-muted small py-3">
-        <span>Deep Learning Brain Tumor MRI Classifier • Built with TensorFlow & Flask</span>
-    </div>
-</div>
+    </main>
 
-<script>
-    function showFileName(input) {
-        if (input.files && input.files[0]) {
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = `<i class="bi bi-search me-1"></i>Analyze ${input.files[0].name}`;
-        }
-    }
-</script>
+    <!-- FOOTER -->
+    <footer>
+        <p><strong>NeuroScan AI</strong> &bull; Brain MRI Classification Platform</p>
+        <p class="footer-sub">Built using Deep Learning, TensorFlow &amp; VGG16 Transfer Learning</p>
+    </footer>
+
+    <!-- Client Script -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
+
 </html>
