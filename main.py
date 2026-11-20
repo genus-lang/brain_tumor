@@ -206,6 +206,11 @@ def api_metrics():
     """REST API endpoint returning evaluation benchmark data."""
     return jsonify(get_performance_dashboard_data())
 
+@app.route('/poll')
+def poll_handler():
+    """Silent handler for browser live-preview/polling extensions to prevent terminal spam."""
+    return ('', 204)
+
 if __name__ == '__main__':
     print("[INFO] Starting NeuroScan AI Medical Platform at http://127.0.0.1:5000")
     app.run(debug=True, port=5000)
