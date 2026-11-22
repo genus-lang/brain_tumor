@@ -23,7 +23,7 @@
 6. [Flask Backend & AI Care Assistant (Q34 – Q37)](#6-flask-backend--ai-care-assistant)
 7. [Real-World Challenges & Future Improvements (Q38 – Q40)](#7-real-world-challenges--future-improvements)
 
----
+
 
 ## 1. General Project Questions
 
